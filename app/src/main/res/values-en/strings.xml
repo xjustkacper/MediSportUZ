@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MediSportUZ++</string>
+
+    <!-- Splash -->
+    <string name="splash_loading">Loading…</string>
+
+    <!-- Login -->
+    <string name="login_title">Sign In</string>
+    <string name="login_email_hint">Email address</string>
+    <string name="login_password_hint">Password</string>
+    <string name="login_button">Sign In</string>
+    <string name="login_forgot_password">Forgot password?</string>
+    <string name="login_no_account">Don\'t have an account?</string>
+    <string name="login_register_link">Sign Up</string>
+
+    <!-- Registration -->
+    <string name="register_title">Sign Up</string>
+    <string name="register_name_hint">Full name</string>
+    <string name="register_email_hint">Email address</string>
+    <string name="register_password_hint">Password</string>
+    <string name="register_repeat_password_hint">Repeat password</string>
+    <string name="register_password_error">Passwords do not match.</string>
+    <string name="register_captcha_title">Captcha Verification</string>
+    <string name="register_captcha_refresh">Refresh code</string>
+    <string name="register_captcha_input_hint">Enter code from image</string>
+    <string name="register_button">Sign Up</string>
+    <string name="register_back">Back</string>
+
+    <!-- Home -->
+    <string name="home_greeting">Hi, %1$s!</string>
+    <string name="home_greeting_default">Hi, Jan!</string>
+    <string name="home_steps_count">7 500</string>
+    <string name="home_steps_goal">10 000 steps</string>
+    <string name="home_steps_remaining">To goal: 2 500</string>
+    <string name="home_distance">Distance: 5.8 km</string>
+    <string name="home_calories">Calories: 320 kcal</string>
+    <string name="home_sos_label">HELP\nSOS</string>
+    <string name="home_ad_text">Google Ads: Sample Ad -\nNew running shoes!</string>
+
+    <!-- Weather -->
+    <string name="weather_search_hint">Enter city name</string>
+    <string name="weather_use_gps">Use GPS</string>
+    <string name="weather_city">Zielona Góra, PL</string>
+    <string name="weather_temperature">18°C</string>
+    <string name="weather_description">Partly cloudy</string>
+    <string name="weather_forecast_title">Forecast for upcoming days</string>
+    <string name="weather_day_mon">Mon</string>
+    <string name="weather_day_tue">Tue</string>
+    <string name="weather_day_wed">Wed</string>
+    <string name="weather_day_thu">Thu</string>
+    <string name="weather_temp_max">Max: 20°</string>
+    <string name="weather_temp_min">Min: 14°</string>
+    <string name="weather_temp_min_alt">Min: 16°</string>
+
+    <!-- Notes -->
+    <string name="notes_title">Notes</string>
+    <string name="notes_share">Share</string>
+    <string name="notes_add">Add note</string>
+    <string name="notes_sample1_title">Training 1: 5km Run</string>
+    <string name="notes_sample1_body">Training 1: 5km run description…</string>
+    <string name="notes_sample2_title">Diet: Meals for tomorrow</string>
+    <string name="notes_sample2_body">Diet: Meals for tomorrow plan…</string>
+    <string name="notes_sample3_title">Goal: 15000 steps</string>
+    <string name="notes_sample3_body">Training step goal 15000 steps…</string>
+    <string name="notes_sample4_title">SOS Coordinates - Jan</string>
+    <string name="notes_sample4_body">SOS Coordinates - Jan N, 505.5672435 E</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_profile_language">Profile &amp; Language</string>
+    <string name="settings_language_label">App language:</string>
+    <string name="settings_language_value">English</string>
+    <string name="settings_appearance">Appearance</string>
+    <string name="settings_dark_mode">Dark theme</string>
+    <string name="settings_step_goal">Step Goal</string>
+    <string name="settings_step_goal_hint">Daily step goal</string>
+    <string name="settings_step_goal_value">10000</string>
+    <string name="settings_sos_section">SOS Configuration</string>
+    <string name="settings_sos_phone_hint">Emergency contact phone number</string>
+    <string name="settings_sos_phone_value">500 600 700</string>
+    <string name="settings_sos_info">When the SOS button is pressed, the app will automatically get GPS coordinates and send an SMS to this number.</string>
+    <string name="settings_ads">Google Ads</string>
+    <string name="settings_ads_toggle">Show Google Ads</string>
+    <string name="settings_account">Account</string>
+    <string name="settings_logout">Log Out</string>
+
+    <!-- Bottom Nav -->
+    <string name="nav_home">Home</string>
+    <string name="nav_weather">Weather</string>
+    <string name="nav_notes">Notes</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Language -->
+    <string name="lang_pl">PL</string>
+    <string name="lang_en">EN</string>
+</resources>

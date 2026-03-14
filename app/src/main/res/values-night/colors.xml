@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Backgrounds -->
+    <color name="colorBackground">#FF121212</color>
+    <color name="colorSurface">#FF1E1E1E</color>
+    <color name="colorSurfaceVariant">#FF2C2C2C</color>
+
+    <!-- Text -->
+    <color name="colorTextPrimary">#FFFFFFFF</color>
+    <color name="colorTextSecondary">#FFB0B0B0</color>
+    <color name="colorTextHint">#FF757575</color>
+    <color name="colorOnSurface">#FFFFFFFF</color>
+
+    <!-- Ad Banner -->
+    <color name="colorAdBanner">#FF1B5E20</color>
+    <color name="colorAdBannerText">#FFFFFFFF</color>
+
+    <!-- Captcha -->
+    <color name="colorCaptchaBg">#FF424242</color>
+    <color name="colorCaptchaText">#FFFFFFFF</color>
+
+    <!-- Step Counter Circle -->
+    <color name="colorStepCircleBg">#FF424242</color>
+
+    <!-- Divider -->
+    <color name="colorDivider">#FF424242</color>
+    <color name="colorErrorLight">#FF4E342E</color>
+
+    <!-- Bottom Nav -->
+    <color name="colorBottomNavBg">#FF1E1E1E</color>
+    <color name="colorBottomNavInactive">#FF757575</color>
+
+    <!-- Card -->
+    <color name="colorCardBg">#FF2C2C2C</color>
+    <color name="colorCardStroke">#FF424242</color>
+
+    <!-- Weather -->
+    <color name="colorWeatherCardBg">#FF2C2C2C</color>
+    <color name="colorForecastCardBg">#FF383838</color>
+</resources>

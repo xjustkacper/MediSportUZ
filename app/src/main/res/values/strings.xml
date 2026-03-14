@@ -1,3 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">MediSportUZ++</string>
+
+    <!-- Splash -->
+    <string name="splash_loading">Ładowanie…</string>
+
+    <!-- Login -->
+    <string name="login_title">Zaloguj się</string>
+    <string name="login_email_hint">Adres e-mail</string>
+    <string name="login_password_hint">Hasło</string>
+    <string name="login_button">Zaloguj</string>
+    <string name="login_forgot_password">Zapomniałeś hasła?</string>
+    <string name="login_no_account">Nie masz konta?</string>
+    <string name="login_register_link">Zarejestruj się</string>
+
+    <!-- Registration -->
+    <string name="register_title">Zarejestruj się</string>
+    <string name="register_name_hint">Imię i nazwisko</string>
+    <string name="register_email_hint">Adres e-mail</string>
+    <string name="register_password_hint">Hasło</string>
+    <string name="register_repeat_password_hint">Powtórz hasło</string>
+    <string name="register_password_error">Hasła minor extra mno marka e-mail.</string>
+    <string name="register_captcha_title">Weryfikacja Captcha</string>
+    <string name="register_captcha_refresh">Odśwież kod</string>
+    <string name="register_captcha_input_hint">Wpisz kod z obrazka</string>
+    <string name="register_button">Zarejestruj</string>
+    <string name="register_back">Cofnij</string>
+
+    <!-- Home -->
+    <string name="home_greeting">Cześć, %1$s!</string>
+    <string name="home_greeting_default">Cześć, Jan!</string>
+    <string name="home_steps_count">7 500</string>
+    <string name="home_steps_goal">10 000 kroków</string>
+    <string name="home_steps_remaining">Do celu: 2 500</string>
+    <string name="home_distance">Dystans: 5.8 km</string>
+    <string name="home_calories">Kalorie: 320 kcal</string>
+    <string name="home_sos_label">POMOC\nSOS</string>
+    <string name="home_ad_text">Google Ads: Przykładowa Reklama -\nNowe buty do biegania!</string>
+
+    <!-- Weather -->
+    <string name="weather_search_hint">Wpisz miejscowość</string>
+    <string name="weather_use_gps">Użyj GPS</string>
+    <string name="weather_city">Zielona Góra, PL</string>
+    <string name="weather_temperature">18°C</string>
+    <string name="weather_description">Częściowe zachmurzenie</string>
+    <string name="weather_forecast_title">Prognoza na kolejne dni</string>
+    <string name="weather_day_mon">Pn</string>
+    <string name="weather_day_tue">Wt</string>
+    <string name="weather_day_wed">Śr</string>
+    <string name="weather_day_thu">Czw</string>
+    <string name="weather_temp_max">Max: 20°</string>
+    <string name="weather_temp_min">Min: 14°</string>
+    <string name="weather_temp_min_alt">Min: 16°</string>
+
+    <!-- Notes -->
+    <string name="notes_title">Notatki</string>
+    <string name="notes_share">Udostępnij</string>
+    <string name="notes_add">Dodaj notatkę</string>
+    <string name="notes_sample1_title">Trening 1: Bieg 5km</string>
+    <string name="notes_sample1_body">Trening 1: Bieg 5km to pozamosowości; so bkm mota…</string>
+    <string name="notes_sample2_title">Dieta: Posiłki na jutro</string>
+    <string name="notes_sample2_body">Dieta: Posiłki na jutro posiłkinowa dieta. posiłki ruto…</string>
+    <string name="notes_sample3_title">Cel: 15000 kroków</string>
+    <string name="notes_sample3_body">Trening sa wspól kroków postaginowa Cel: 15000 króko…</string>
+    <string name="notes_sample4_title">Współrzędne SOS - Jan</string>
+    <string name="notes_sample4_body">Współrzędne SOS - Jan N, 505.5672435 E</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Ustawienia</string>
+    <string name="settings_profile_language">Profil i Język</string>
+    <string name="settings_language_label">Język aplikacji:</string>
+    <string name="settings_language_value">Polski</string>
+    <string name="settings_appearance">Wygląd</string>
+    <string name="settings_dark_mode">Motyw ciemny</string>
+    <string name="settings_step_goal">Cel Kroków</string>
+    <string name="settings_step_goal_hint">Dzienny cel kroków</string>
+    <string name="settings_step_goal_value">10000</string>
+    <string name="settings_sos_section">Konfiguracja SOS</string>
+    <string name="settings_sos_phone_hint">Numer telefonu kontaktu ratunkowego</string>
+    <string name="settings_sos_phone_value">500 600 700</string>
+    <string name="settings_sos_info">Po naciśnięciu przycisku SOS aplikacja automatycznie pobierze współrzędne GPS i wyśle SMS na ten numer.</string>
+    <string name="settings_ads">Reklamy Google</string>
+    <string name="settings_ads_toggle">Pokaż reklamy Google</string>
+    <string name="settings_account">Konto</string>
+    <string name="settings_logout">Wyloguj</string>
+
+    <!-- Bottom Nav -->
+    <string name="nav_home">Home</string>
+    <string name="nav_weather">Pogoda</string>
+    <string name="nav_notes">Notatki</string>
+    <string name="nav_settings">Ustawienia</string>
+
+    <!-- Language -->
+    <string name="lang_pl">PL</string>
+    <string name="lang_en">EN</string>
 </resources>
