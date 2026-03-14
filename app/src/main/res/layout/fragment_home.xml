@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBackground">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="0dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Top Bar: App Name + Notification Bell + Language Flags -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp">
+
+                <!-- Language flags - top right -->
+                <LinearLayout
+                    android:id="@+id/homeFlags"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/lang_pl"
+                        android:textColor="@color/colorTextSecondary"
+                        android:textSize="12sp"
+                        android:paddingEnd="2dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🇵🇱"
+                        android:textSize="18sp"
+                        android:paddingEnd="8dp"
+                        android:paddingStart="2dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🇬🇧"
+                        android:textSize="18sp"
+                        android:paddingEnd="2dp" />
+                </LinearLayout>
+
+                <!-- App Name -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_toStartOf="@id/homeFlags"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/app_name"
+                            android:textColor="@color/colorTextPrimary"
+                            android:textSize="22sp"
+                            android:textStyle="bold" />
+
+                        <ImageView
+                            android:id="@+id/homeNotificationBell"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginStart="8dp"
+                            android:src="@drawable/ic_notification"
+                            android:tint="@color/colorPrimary"
+                            android:contentDescription="Notifications" />
+                    </LinearLayout>
+
+                    <!-- Greeting -->
+                    <TextView
+                        android:id="@+id/homeGreeting"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/home_greeting_default"
+                        android:textColor="@color/colorTextSecondary"
+                        android:textSize="16sp" />
+                </LinearLayout>
+            </RelativeLayout>
+
+            <!-- Google Ads Banner -->
+            <LinearLayout
+                android:id="@+id/homeAdBanner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_ad_banner"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="10dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="16dp">
+
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/ic_ad"
+                    android:tint="@color/colorAdBannerIcon"
+                    android:contentDescription="Ad" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="10dp"
+                    android:text="@string/home_ad_text"
+                    android:textColor="@color/colorAdBannerText"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+            <!-- Step Counter Circle -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal">
+
+                <!-- Circular Progress Background -->
+                <FrameLayout
+                    android:layout_width="220dp"
+                    android:layout_height="220dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/bg_circle_progress">
+
+                    <!-- Inner content -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <!-- Steps icon -->
+                        <ImageView
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:src="@drawable/ic_steps"
+                            android:tint="@color/colorStepIcon"
+                            android:contentDescription="Steps" />
+
+                        <!-- Step count -->
+                        <TextView
+                            android:id="@+id/homeStepCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/home_steps_count"
+                            android:textColor="@color/colorTextPrimary"
+                            android:textSize="36sp"
+                            android:textStyle="bold" />
+
+                        <!-- Goal -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/home_steps_goal"
+                            android:textColor="@color/colorTextSecondary"
+                            android:textSize="14sp" />
+
+                        <!-- Remaining -->
+                        <TextView
+                            android:id="@+id/homeStepsRemaining"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/home_steps_remaining"
+                            android:textColor="@color/colorPrimary"
+                            android:textSize="13sp"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
+                </FrameLayout>
+            </FrameLayout>
+
+            <!-- Stats Row: Distance + Calories -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <!-- Distance -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_distance"
+                        android:tint="@color/colorPrimary"
+                        android:contentDescription="Distance" />
+
+                    <TextView
+                        android:id="@+id/homeDistance"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="@string/home_distance"
+                        android:textColor="@color/colorTextPrimary"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="32dp"
+                    android:layout_height="1dp" />
+
+                <!-- Calories -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_calories"
+                        android:tint="@color/colorPrimary"
+                        android:contentDescription="Calories" />
+
+                    <TextView
+                        android:id="@+id/homeCalories"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="@string/home_calories"
+                        android:textColor="@color/colorTextPrimary"
+                        android:textSize="14sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Floating SOS Button -->
+    <FrameLayout
+        android:id="@+id/homeSosButton"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/bg_sos_button"
+        android:elevation="8dp"
+        android:clickable="true"
+        android:focusable="true">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="@string/home_sos_label"
+            android:textColor="@color/colorOnSOS"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:lineSpacingExtra="-2dp" />
+    </FrameLayout>
+
+</FrameLayout>
