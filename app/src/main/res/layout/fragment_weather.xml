@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorBackground"
@@ -57,8 +58,8 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/ic_search"
-                    android:tint="@color/colorTextSecondary"
-                    android:contentDescription="Search" />
+                    android:contentDescription="Search"
+                    app:tint="@color/colorTextSecondary" />
             </LinearLayout>
 
             <!-- Use GPS Button -->
@@ -108,8 +109,8 @@
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:src="@drawable/ic_weather_cloud"
-                    android:tint="@color/colorPrimary"
-                    android:contentDescription="Weather" />
+                    android:contentDescription="Weather"
+                    app:tint="@color/colorPrimary" />
 
                 <TextView
                     android:id="@+id/weatherTemperature"
@@ -163,6 +164,7 @@
                 android:padding="12dp">
 
                 <TextView
+                    android:id="@+id/forecastDay1Name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/weather_day_mon"
@@ -171,14 +173,16 @@
                     android:textStyle="bold" />
 
                 <ImageView
+                    android:id="@+id/forecastDay1Icon"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:layout_marginTop="4dp"
                     android:src="@drawable/ic_weather_sun"
-                    android:tint="@color/colorPrimary"
-                    android:contentDescription="Sunny" />
+                    android:contentDescription="Sunny"
+                    app:tint="@color/colorPrimary" />
 
                 <TextView
+                    android:id="@+id/forecastDay1TempMax"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
@@ -187,6 +191,7 @@
                     android:textSize="12sp" />
 
                 <TextView
+                    android:id="@+id/forecastDay1TempMin"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/weather_temp_min"
@@ -207,6 +212,7 @@
                 android:padding="12dp">
 
                 <TextView
+                    android:id="@+id/forecastDay2Name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/weather_day_tue"
@@ -215,14 +221,16 @@
                     android:textStyle="bold" />
 
                 <ImageView
+                    android:id="@+id/forecastDay2Icon"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:layout_marginTop="4dp"
                     android:src="@drawable/ic_weather_sun"
-                    android:tint="@color/colorPrimary"
-                    android:contentDescription="Sunny" />
+                    android:contentDescription="Sunny"
+                    app:tint="@color/colorPrimary" />
 
                 <TextView
+                    android:id="@+id/forecastDay2TempMax"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
@@ -231,6 +239,7 @@
                     android:textSize="12sp" />
 
                 <TextView
+                    android:id="@+id/forecastDay2TempMin"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/weather_temp_min"
@@ -250,6 +259,7 @@
                 android:padding="12dp">
 
                 <TextView
+                    android:id="@+id/forecastDay3Name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/weather_day_wed"
@@ -258,14 +268,16 @@
                     android:textStyle="bold" />
 
                 <ImageView
+                    android:id="@+id/forecastDay3Icon"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:layout_marginTop="4dp"
                     android:src="@drawable/ic_weather_cloud"
-                    android:tint="@color/colorTextSecondary"
-                    android:contentDescription="Cloudy" />
+                    android:contentDescription="Cloudy"
+                    app:tint="@color/colorTextSecondary" />
 
                 <TextView
+                    android:id="@+id/forecastDay3TempMax"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
@@ -274,6 +286,7 @@
                     android:textSize="12sp" />
 
                 <TextView
+                    android:id="@+id/forecastDay3TempMin"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/weather_temp_min_alt"
