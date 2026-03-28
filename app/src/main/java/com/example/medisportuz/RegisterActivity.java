@@ -15,7 +15,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 public class RegisterActivity extends AppCompatActivity {
@@ -115,14 +118,30 @@ public class RegisterActivity extends AppCompatActivity {
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        // Set display name on the newly created user profile
-                        if (mAuth.getCurrentUser() != null) {
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        if (user != null) {
+                            // 1. Zapis Imienia na obiekcie Auth (tak jak było)
                             UserProfileChangeRequest profileUpdate = new UserProfileChangeRequest.Builder()
                                     .setDisplayName(name)
                                     .build();
-                            mAuth.getCurrentUser().updateProfile(profileUpdate)
-                                    .addOnCompleteListener(profileTask -> {
-                                        // Send verification email
+                            user.updateProfile(profileUpdate);
+
+                            // 2. Utworzenie obiektu dla Firestore
+                            Map<String, Object> userMap = new HashMap<>();
+                            userMap.put("imię", name);
+                            userMap.put("email", email);
+                            userMap.put("utworzono", System.currentTimeMillis());
+
+                            // 3. Zapis do kolekcji "users" w bazie Firestore pod kluczem UID
+                            FirebaseFirestore.getInstance().collection("users")
+                                    .document(user.getUid())
+                                    .set(userMap)
+                                    .addOnSuccessListener(aVoid -> {
+                                        // Sukces zapisu do bazy — wyślij maila i wyloguj
+                                        sendVerificationEmail();
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        // Jeśli zapis się nie powiedzie, mimo wszystko wyślij maila
                                         sendVerificationEmail();
                                     });
                         } else {
