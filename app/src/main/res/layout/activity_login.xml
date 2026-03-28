@@ -133,6 +133,69 @@
             android:textColor="@color/colorLink"
             android:textSize="13sp" />
 
+        <!-- Captcha Section -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/register_captcha_title"
+            android:textColor="@color/colorTextPrimary"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <!-- Captcha Image Box -->
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_captcha">
+
+                <TextView
+                    android:id="@+id/loginCaptchaText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="a7X9p"
+                    android:textColor="@color/colorCaptchaText"
+                    android:textSize="22sp"
+                    android:textStyle="bold|italic"
+                    android:fontFamily="monospace" />
+            </FrameLayout>
+
+            <!-- Refresh Captcha -->
+            <TextView
+                android:id="@+id/loginCaptchaRefresh"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:text="@string/register_captcha_refresh"
+                android:textColor="@color/colorLink"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <!-- Captcha Input -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/loginCaptchaInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/loginCaptchaInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/register_captcha_input_hint"
+                android:inputType="text" />
+        </com.google.android.material.textfield.TextInputLayout>
+
         <!-- Login Button -->
         <Button
             android:id="@+id/loginButton"
