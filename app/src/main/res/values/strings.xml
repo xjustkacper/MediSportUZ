@@ -94,4 +94,30 @@
     <!-- Language -->
     <string name="lang_pl">PL</string>
     <string name="lang_en">EN</string>
+
+    <!-- Auth Messages -->
+    <string name="auth_empty_fields">Wypełnij wszystkie pola</string>
+    <string name="auth_password_short">Hasło musi mieć min. 6 znaków</string>
+    <string name="auth_password_mismatch">Hasła nie są identyczne</string>
+    <string name="auth_captcha_wrong">Nieprawidłowy kod Captcha</string>
+    <string name="auth_login_failed">Błędny e-mail lub hasło</string>
+    <string name="auth_register_success">Konto utworzone pomyślnie!</string>
+    <string name="auth_register_failed">Nie udało się utworzyć konta</string>
+    <string name="auth_email_invalid">Podaj prawidłowy adres e-mail</string>
+    <string name="auth_email_exists">Konto z tym adresem już istnieje</string>
+    <string name="auth_logging_in">Logowanie…</string>
+    <string name="auth_registering">Rejestracja…</string>
+    <string name="auth_verify_email_sent">Link aktywacyjny został wysłany na Twój e-mail</string>
+    <string name="auth_verify_email_required">Potwierdź swój adres e-mail klikając link w wiadomości</string>
+    <string name="auth_email_not_verified">Twoje konto nie zostało jeszcze aktywowane. Sprawdź skrzynkę e-mail.</string>
+    <string name="auth_resend_verification">Wyślij ponownie link aktywacyjny</string>
+    <string name="auth_verification_resent">Link aktywacyjny wysłany ponownie</string>
+
+    <!-- Password Reset -->
+    <string name="auth_reset_title">Resetowanie hasła</string>
+    <string name="auth_reset_message">Podaj adres e-mail powiązany z kontem. Wyślemy link do zresetowania hasła.</string>
+    <string name="auth_reset_send">Wyślij</string>
+    <string name="auth_reset_cancel">Anuluj</string>
+    <string name="auth_reset_sent">Link do resetowania hasła wysłany na Twój e-mail</string>
+    <string name="auth_reset_failed">Nie znaleziono konta z tym adresem</string>
 </resources>
