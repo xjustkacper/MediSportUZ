@@ -16,7 +16,7 @@
 
     <!-- Registration -->
     <string name="register_title">Zarejestruj się</string>
-    <string name="register_name_hint">Imię i nazwisko</string>
+    <string name="register_name_hint">Imię</string>
     <string name="register_email_hint">Adres e-mail</string>
     <string name="register_password_hint">Hasło</string>
     <string name="register_repeat_password_hint">Powtórz hasło</string>
