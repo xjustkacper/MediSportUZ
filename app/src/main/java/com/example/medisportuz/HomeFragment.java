@@ -142,11 +142,8 @@ public class HomeFragment extends Fragment {
 
         // Register receiver for updates from service
         IntentFilter filter = new IntentFilter("STEP_UPDATE");
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            requireActivity().registerReceiver(stepReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
-        } else {
-            requireActivity().registerReceiver(stepReceiver, filter);
-        }
+        // Using ContextCompat to handle RECEIVER_NOT_EXPORTED on all API levels for Android 14+ security
+        ContextCompat.registerReceiver(requireContext(), stepReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
     }
 
     @Override
