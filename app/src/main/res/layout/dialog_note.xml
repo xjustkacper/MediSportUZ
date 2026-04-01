@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <EditText
+        android:id="@+id/dialogNoteTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Tytuł"
+        android:textSize="16sp"
+        android:inputType="text" />
+
+    <EditText
+        android:id="@+id/dialogNoteContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:hint="Treść notatki..."
+        android:textSize="14sp"
+        android:inputType="textMultiLine"
+        android:minLines="4"
+        android:gravity="top" />
+
+    <Spinner
+        android:id="@+id/dialogNoteCategory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp" />
+
+</LinearLayout>
