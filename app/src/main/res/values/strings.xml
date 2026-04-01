@@ -20,7 +20,7 @@
     <string name="register_email_hint">Adres e-mail</string>
     <string name="register_password_hint">Hasło</string>
     <string name="register_repeat_password_hint">Powtórz hasło</string>
-    <string name="register_password_error">Hasła minor extra mno marka e-mail.</string>
+    <string name="register_password_error">Hasła nie są identyczne.</string>
     <string name="register_captcha_title">Weryfikacja Captcha</string>
     <string name="register_captcha_refresh">Odśwież kod</string>
     <string name="register_captcha_input_hint">Wpisz kod z obrazka</string>
@@ -30,11 +30,16 @@
     <!-- Home -->
     <string name="home_greeting">Cześć, %1$s!</string>
     <string name="home_greeting_default">Cześć, Jan!</string>
-    <string name="home_steps_count">7 500</string>
+    <string name="home_steps_count">0</string>
+    <string name="home_steps_count_format">%1$d</string>
     <string name="home_steps_goal">10 000 kroków</string>
-    <string name="home_steps_remaining">Do celu: 2 500</string>
-    <string name="home_distance">Dystans: 5.8 km</string>
-    <string name="home_calories">Kalorie: 320 kcal</string>
+    <string name="home_steps_goal_format">%1$d kroków</string>
+    <string name="home_steps_remaining">Do celu: 10 000</string>
+    <string name="home_steps_remaining_format">Do celu: %1$d</string>
+    <string name="home_distance">Dystans: 0.00 km</string>
+    <string name="home_distance_format">Dystans: %1$.2f km</string>
+    <string name="home_calories">Kalorie: 0 kcal</string>
+    <string name="home_calories_format">Kalorie: %1$.0f kcal</string>
     <string name="home_sos_label">POMOC\nSOS</string>
     <string name="home_ad_text">Google Ads: Przykładowa Reklama -\nNowe buty do biegania!</string>
 
