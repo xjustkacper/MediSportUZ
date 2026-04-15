@@ -30,11 +30,16 @@
     <!-- Home -->
     <string name="home_greeting">Hi, %1$s!</string>
     <string name="home_greeting_default">Hi, Jan!</string>
-    <string name="home_steps_count">7 500</string>
+    <string name="home_steps_count">0</string>
+    <string name="home_steps_count_format">%1$d</string>
     <string name="home_steps_goal">10 000 steps</string>
-    <string name="home_steps_remaining">To goal: 2 500</string>
-    <string name="home_distance">Distance: 5.8 km</string>
-    <string name="home_calories">Calories: 320 kcal</string>
+    <string name="home_steps_goal_format">%1$d steps</string>
+    <string name="home_steps_remaining">To goal: 10 000</string>
+    <string name="home_steps_remaining_format">To goal: %1$d</string>
+    <string name="home_distance">Distance: 0.00 km</string>
+    <string name="home_distance_format">Distance: %1$.2f km</string>
+    <string name="home_calories">Calories: 0 kcal</string>
+    <string name="home_calories_format">Calories: %1$.0f kcal</string>
     <string name="home_sos_label">HELP\nSOS</string>
     <string name="home_ad_text">Google Ads: Sample Ad -\nNew running shoes!</string>
 
