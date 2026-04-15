@@ -29,6 +29,10 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +46,7 @@ public class HomeFragment extends Fragment {
     private TextView distanceTextView;
     private TextView caloriesTextView;
     private CircularProgressIndicator stepProgressBar;
+    private AdView adView;
 
     private int stepGoal = 10000;
     private SharedPreferences sharedPreferences;
@@ -113,6 +118,12 @@ public class HomeFragment extends Fragment {
         int lastSteps = sharedPreferences.getInt("last_recorded_steps", 0);
         updateUI(lastSteps);
 
+        // --- Google AdMob Banner ---
+        MobileAds.initialize(requireContext(), initializationStatus -> {});
+        adView = view.findViewById(R.id.homeAdBanner);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        adView.loadAd(adRequest);
+
         return view;
     }
 
@@ -179,7 +190,12 @@ public class HomeFragment extends Fragment {
     public void onResume() {
         super.onResume();
         loadStepGoal();
-        checkPermissionsAndStartService();
+
+        // Uruchom serwis tylko jeśli cel nie został jeszcze osiągnięty
+        boolean goalReached = sharedPreferences.getBoolean("goal_reached_today", false);
+        if (!goalReached) {
+            checkPermissionsAndStartService();
+        }
 
         // Update UI with latest saved value immediately on resume
         int lastSteps = sharedPreferences.getInt("last_recorded_steps", 0);
