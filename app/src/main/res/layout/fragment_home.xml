@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorBackground">
@@ -77,14 +78,6 @@
                             android:textSize="22sp"
                             android:textStyle="bold" />
 
-                        <ImageView
-                            android:id="@+id/homeNotificationBell"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_marginStart="8dp"
-                            android:src="@drawable/ic_notification"
-                            android:tint="@color/colorPrimary"
-                            android:contentDescription="Notifications" />
                     </LinearLayout>
 
                     <!-- Greeting -->
@@ -133,58 +126,65 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal">
 
-                <!-- Circular Progress Background -->
-                <FrameLayout
+                <!-- Circular Progress (determinate, fills clockwise from 12 o'clock) -->
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                    android:id="@+id/homeStepProgressBar"
                     android:layout_width="220dp"
                     android:layout_height="220dp"
                     android:layout_gravity="center"
-                    android:background="@drawable/bg_circle_progress">
+                    app:indicatorSize="210dp"
+                    app:trackThickness="10dp"
+                    app:indicatorColor="@color/colorStepCircleProgress"
+                    app:trackColor="@color/colorStepCircleBg"
+                    app:indicatorDirectionCircular="clockwise"
+                    android:max="10000"
+                    android:progress="0" />
 
-                    <!-- Inner content -->
-                    <LinearLayout
+                <!-- Inner content overlaid on top -->
+                <LinearLayout
+                    android:layout_width="220dp"
+                    android:layout_height="220dp"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <!-- Steps icon -->
+                    <ImageView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:src="@drawable/ic_steps"
+                        android:tint="@color/colorStepIcon"
+                        android:contentDescription="Steps" />
+
+                    <!-- Step count -->
+                    <TextView
+                        android:id="@+id/homeStepCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:gravity="center"
-                        android:orientation="vertical">
+                        android:text="@string/home_steps_count"
+                        android:textColor="@color/colorTextPrimary"
+                        android:textSize="36sp"
+                        android:textStyle="bold" />
 
-                        <!-- Steps icon -->
-                        <ImageView
-                            android:layout_width="36dp"
-                            android:layout_height="36dp"
-                            android:src="@drawable/ic_steps"
-                            android:tint="@color/colorStepIcon"
-                            android:contentDescription="Steps" />
+                    <!-- Goal (dynamic) -->
+                    <TextView
+                        android:id="@+id/homeStepGoalText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/home_steps_goal"
+                        android:textColor="@color/colorTextSecondary"
+                        android:textSize="14sp" />
 
-                        <!-- Step count -->
-                        <TextView
-                            android:id="@+id/homeStepCount"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/home_steps_count"
-                            android:textColor="@color/colorTextPrimary"
-                            android:textSize="36sp"
-                            android:textStyle="bold" />
-
-                        <!-- Goal -->
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/home_steps_goal"
-                            android:textColor="@color/colorTextSecondary"
-                            android:textSize="14sp" />
-
-                        <!-- Remaining -->
-                        <TextView
-                            android:id="@+id/homeStepsRemaining"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/home_steps_remaining"
-                            android:textColor="@color/colorPrimary"
-                            android:textSize="13sp"
-                            android:layout_marginTop="2dp" />
-                    </LinearLayout>
-                </FrameLayout>
+                    <!-- Remaining -->
+                    <TextView
+                        android:id="@+id/homeStepsRemaining"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/home_steps_remaining"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="13sp"
+                        android:layout_marginTop="2dp" />
+                </LinearLayout>
             </FrameLayout>
 
             <!-- Stats Row: Distance + Calories -->

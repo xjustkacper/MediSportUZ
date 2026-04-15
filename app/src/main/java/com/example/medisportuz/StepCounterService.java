@@ -25,7 +25,9 @@ public class StepCounterService extends Service implements SensorEventListener {
 
     private static final String TAG = "StepCounterService";
     private static final String CHANNEL_ID = "StepCounterChannel";
+    private static final String GOAL_CHANNEL_ID = "StepGoalChannel";
     private static final int NOTIFICATION_ID = 1;
+    private static final int GOAL_NOTIFICATION_ID = 2;
 
     private SensorManager sensorManager;
     private Sensor stepCounterSensor;
@@ -34,6 +36,8 @@ public class StepCounterService extends Service implements SensorEventListener {
 
     private float stepsAtReset = -1;
     private int currentDaySteps = 0;
+    private int stepGoal = 10000;
+    private boolean goalReachedToday = false;
     
     // Algorytm buforowania (filtr machania ręką)
     private int stepBuffer = 0;
@@ -48,15 +52,27 @@ public class StepCounterService extends Service implements SensorEventListener {
         prefs = getSharedPreferences("MediSportPrefs", Context.MODE_PRIVATE);
         
         checkMidnightReset();
+        loadStepGoal();
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         stepCounterSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
         stepDetectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
 
         createNotificationChannel();
+        createGoalNotificationChannel();
         startForeground(NOTIFICATION_ID, getNotification(currentDaySteps));
 
         registerSensors();
+    }
+
+    private void loadStepGoal() {
+        String goalStr = prefs.getString("step_goal", "10000");
+        try {
+            stepGoal = Integer.parseInt(goalStr);
+        } catch (NumberFormatException e) {
+            stepGoal = 10000;
+        }
+        goalReachedToday = prefs.getBoolean("goal_reached_today", false);
     }
 
     private void checkMidnightReset() {
@@ -71,11 +87,14 @@ public class StepCounterService extends Service implements SensorEventListener {
                     .putInt("last_recorded_steps", 0)
                     .putFloat("steps_at_reset", -1)
                     .putString("last_recorded_date", currentDate)
+                    .putBoolean("goal_reached_today", false)
                     .apply();
+            goalReachedToday = false;
             Log.d(TAG, "Reset o północy wykonany. Nowy dzień: " + currentDate);
         } else {
             stepsAtReset = prefs.getFloat("steps_at_reset", -1);
             currentDaySteps = prefs.getInt("last_recorded_steps", 0);
+            goalReachedToday = prefs.getBoolean("goal_reached_today", false);
         }
     }
 
@@ -90,6 +109,8 @@ public class StepCounterService extends Service implements SensorEventListener {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        // Reload goal in case it was changed from Settings
+        loadStepGoal();
         return START_STICKY;
     }
 
@@ -146,12 +167,47 @@ public class StepCounterService extends Service implements SensorEventListener {
 
     private void saveAndNotify() {
         prefs.edit().putInt("last_recorded_steps", currentDaySteps).apply();
-        updateNotification(currentDaySteps);
         broadcastStepUpdate(currentDaySteps);
+
+        // Sprawdź czy cel został osiągnięty
+        if (currentDaySteps >= stepGoal && !goalReachedToday) {
+            goalReachedToday = true;
+            prefs.edit().putBoolean("goal_reached_today", true).apply();
+
+            // Wyślij popup powiadomienie o osiągnięciu celu
+            showGoalReachedNotification();
+
+            // Zatrzymaj serwis (onDestroy zajmie się usunięciem powiadomienia w tle)
+            Log.d(TAG, "Cel osiągnięty! Zatrzymuję serwis. Kroki: " + currentDaySteps);
+            stopSelf();
+            return;
+        }
+
+        updateNotification(currentDaySteps);
+    }
+
+    private void showGoalReachedNotification() {
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if (notificationManager == null) return;
+
+        String contentText = String.format(Locale.getDefault(),
+                "Zrobiłeś %d kroków! Cel %d kroków osiągnięty!", currentDaySteps, stepGoal);
+
+        Notification notification = new NotificationCompat.Builder(this, GOAL_CHANNEL_ID)
+                .setContentTitle("🎉 Cel dzienny osiągnięty!")
+                .setContentText(contentText)
+                .setSmallIcon(R.drawable.ic_steps)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true)
+                .setOngoing(false)
+                .build();
+
+        notificationManager.notify(GOAL_NOTIFICATION_ID, notification);
     }
 
     private void broadcastStepUpdate(int steps) {
         Intent intent = new Intent("STEP_UPDATE");
+        intent.setPackage(getPackageName());
         intent.putExtra("steps", steps);
         sendBroadcast(intent);
     }
@@ -188,6 +244,19 @@ public class StepCounterService extends Service implements SensorEventListener {
         }
     }
 
+    private void createGoalNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel goalChannel = new NotificationChannel(
+                    GOAL_CHANNEL_ID,
+                    "Cel Kroków",
+                    NotificationManager.IMPORTANCE_HIGH
+            );
+            goalChannel.setDescription("Powiadomienie o osiągnięciu dziennego celu kroków");
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            if (manager != null) manager.createNotificationChannel(goalChannel);
+        }
+    }
+
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 
@@ -198,5 +267,14 @@ public class StepCounterService extends Service implements SensorEventListener {
     public void onDestroy() {
         super.onDestroy();
         sensorManager.unregisterListener(this);
+        try {
+            stopForeground(true);
+        } catch (Exception e) {
+            Log.e(TAG, "Error stopping foreground", e);
+        }
+        NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if (nm != null) {
+            nm.cancel(NOTIFICATION_ID);
+        }
     }
 }
