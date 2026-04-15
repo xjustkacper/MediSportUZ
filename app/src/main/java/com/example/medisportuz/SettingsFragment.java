@@ -14,6 +14,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import com.google.android.material.switchmaterial.SwitchMaterial;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.os.LocaleListCompat;
+
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -41,6 +48,51 @@ public class SettingsFragment extends Fragment {
         if (!currentSosPhone.isEmpty()) {
             sosPhoneInput.setText(currentSosPhone);
         }
+
+        // --- Logika Motywu (Jasny/Ciemny) ---
+        SwitchMaterial darkModeSwitch = view.findViewById(R.id.settingsDarkModeSwitch);
+        boolean isDarkMode = sharedPreferences.getBoolean("dark_mode", true);
+        darkModeSwitch.setChecked(isDarkMode);
+
+        darkModeSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            sharedPreferences.edit().putBoolean("dark_mode", isChecked).apply();
+            if (isChecked) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+            } else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+            }
+        });
+
+        // --- Logika Języka ---
+        LinearLayout languageContainer = view.findViewById(R.id.settingsLanguageContainer);
+        TextView languageValueText = view.findViewById(R.id.settingsLanguageValueText);
+
+        String currentLanguage = sharedPreferences.getString("language", "pl");
+        if (currentLanguage.equals("en")) {
+            languageValueText.setText("English");
+        } else {
+            languageValueText.setText("Polski");
+        }
+
+        languageContainer.setOnClickListener(v -> {
+            String[] languages = {"Polski", "English"};
+            int checkedItem = currentLanguage.equals("en") ? 1 : 0;
+
+            new AlertDialog.Builder(requireContext())
+                    .setTitle(R.string.settings_profile_language)
+                    .setSingleChoiceItems(languages, checkedItem, (dialog, which) -> {
+                        String selectedLang = (which == 0) ? "pl" : "en";
+                        if (!selectedLang.equals(currentLanguage)) {
+                            sharedPreferences.edit().putString("language", selectedLang).apply();
+                            
+                            // Aplikuj język przez AndroidX
+                            LocaleListCompat appLocale = LocaleListCompat.forLanguageTags(selectedLang);
+                            AppCompatDelegate.setApplicationLocales(appLocale);
+                        }
+                        dialog.dismiss();
+                    })
+                    .show();
+        });
 
         // Save button - saves step goal and SOS phone at once
         Button saveButton = view.findViewById(R.id.settingsSaveButton);
