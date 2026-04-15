@@ -73,7 +73,7 @@
 
     <!-- Settings -->
     <string name="settings_title">Settings</string>
-    <string name="settings_profile_language">Profile &amp; Language</string>
+    <string name="settings_profile_language">Language</string>
     <string name="settings_language_label">App language:</string>
     <string name="settings_language_value">English</string>
     <string name="settings_appearance">Appearance</string>
@@ -85,8 +85,7 @@
     <string name="settings_sos_phone_hint">Emergency contact phone number</string>
     <string name="settings_sos_phone_value">500 600 700</string>
     <string name="settings_sos_info">When the SOS button is pressed, the app will automatically get GPS coordinates and send an SMS to this number.</string>
-    <string name="settings_ads">Google Ads</string>
-    <string name="settings_ads_toggle">Show Google Ads</string>
+    <string name="settings_save">Save</string>
     <string name="settings_account">Account</string>
     <string name="settings_logout">Log Out</string>
 

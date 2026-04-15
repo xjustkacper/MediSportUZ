@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import com.google.android.material.progressindicator.CircularProgressIndicator;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,8 +38,10 @@ public class HomeFragment extends Fragment {
 
     private TextView stepCountTextView;
     private TextView stepsRemainingTextView;
+    private TextView stepGoalTextView;
     private TextView distanceTextView;
     private TextView caloriesTextView;
+    private CircularProgressIndicator stepProgressBar;
 
     private int stepGoal = 10000;
     private SharedPreferences sharedPreferences;
@@ -98,8 +101,10 @@ public class HomeFragment extends Fragment {
         // --- Logika z brancha Krokomierz (Step Counter UI) ---
         stepCountTextView = view.findViewById(R.id.homeStepCount);
         stepsRemainingTextView = view.findViewById(R.id.homeStepsRemaining);
+        stepGoalTextView = view.findViewById(R.id.homeStepGoalText);
         distanceTextView = view.findViewById(R.id.homeDistance);
         caloriesTextView = view.findViewById(R.id.homeCalories);
+        stepProgressBar = view.findViewById(R.id.homeStepProgressBar);
 
         sharedPreferences = requireActivity().getSharedPreferences("MediSportPrefs", Context.MODE_PRIVATE);
         loadStepGoal();
@@ -154,6 +159,13 @@ public class HomeFragment extends Fragment {
             int remaining = stepGoal - steps;
             if (remaining < 0) remaining = 0;
             stepsRemainingTextView.setText(getString(R.string.home_steps_remaining_format, remaining));
+
+            // Update goal text dynamically
+            stepGoalTextView.setText(getString(R.string.home_steps_goal_format, stepGoal));
+
+            // Update circular progress bar
+            stepProgressBar.setMax(stepGoal);
+            stepProgressBar.setProgress(Math.min(steps, stepGoal));
 
             float distanceKm = (steps * 0.762f) / 1000f;
             float calories = steps * 0.04f;

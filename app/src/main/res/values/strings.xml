@@ -73,7 +73,7 @@
 
     <!-- Settings -->
     <string name="settings_title">Ustawienia</string>
-    <string name="settings_profile_language">Profil i Język</string>
+    <string name="settings_profile_language">Język</string>
     <string name="settings_language_label">Język aplikacji:</string>
     <string name="settings_language_value">Polski</string>
     <string name="settings_appearance">Wygląd</string>
@@ -85,8 +85,7 @@
     <string name="settings_sos_phone_hint">Numer telefonu kontaktu ratunkowego</string>
     <string name="settings_sos_phone_value">500 600 700</string>
     <string name="settings_sos_info">Po naciśnięciu przycisku SOS aplikacja automatycznie pobierze współrzędne GPS i wyśle SMS na ten numer.</string>
-    <string name="settings_ads">Reklamy Google</string>
-    <string name="settings_ads_toggle">Pokaż reklamy Google</string>
+    <string name="settings_save">Zapisz</string>
     <string name="settings_account">Konto</string>
     <string name="settings_logout">Wyloguj</string>
 
