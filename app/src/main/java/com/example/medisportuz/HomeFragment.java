@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +15,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
+
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -123,6 +126,27 @@ public class HomeFragment extends Fragment {
         adView = view.findViewById(R.id.homeAdBanner);
         AdRequest adRequest = new AdRequest.Builder().build();
         adView.loadAd(adRequest);
+
+        // --- SOS Message ---
+        FrameLayout sosButton = view.findViewById(R.id.homeSosButton);
+
+        // Ustawiamy nasłuchiwacz kliknięć
+        sosButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MediSportPrefs", Context.MODE_PRIVATE);
+                String phoneNumber = sharedPreferences.getString("sos_phone", "0");
+
+                String message = "Achtung! Ich brauche hilfe!";
+
+                Uri uri = Uri.parse("smsto:" + phoneNumber);
+                Intent intent = new Intent(Intent.ACTION_SENDTO, uri);
+                intent.putExtra("sms_body", message);
+
+                // Uruchamiamy aplikację
+                startActivity(intent);
+            }
+        });
 
         return view;
     }
