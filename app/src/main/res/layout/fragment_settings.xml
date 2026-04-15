@@ -28,7 +28,7 @@
             android:textColor="@color/colorTextPrimary"
             android:textSize="14sp" />
 
-        <!-- Section: Profile & Language -->
+        <!-- Section: Language -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -45,19 +45,10 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <!-- Avatar -->
-            <ImageView
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:src="@drawable/ic_avatar"
-                android:tint="@color/colorTextSecondary"
-                android:contentDescription="Avatar" />
-
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginStart="12dp"
                 android:orientation="vertical">
 
                 <TextView
@@ -207,44 +198,17 @@
             android:textColor="@color/colorTextSecondary"
             android:textSize="12sp" />
 
-        <!-- Divider -->
-        <View
+        <!-- Save Button -->
+        <Button
+            android:id="@+id/settingsSaveButton"
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="16dp"
-            android:background="@color/colorDivider" />
-
-        <!-- Section: Google Ads -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/settings_ads"
-            android:textColor="@color/colorTextPrimary"
+            android:layout_height="48dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/bg_button_primary"
+            android:text="@string/settings_save"
+            android:textColor="@color/white"
             android:textSize="16sp"
-            android:textStyle="bold" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/settings_ads_toggle"
-                android:textColor="@color/colorTextPrimary"
-                android:textSize="15sp" />
-
-            <com.google.android.material.switchmaterial.SwitchMaterial
-                android:id="@+id/settingsAdsSwitch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true" />
-        </LinearLayout>
+            android:textAllCaps="false" />
 
         <!-- Divider -->
         <View
