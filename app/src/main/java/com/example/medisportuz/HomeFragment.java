@@ -7,9 +7,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +26,8 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -35,9 +39,13 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.location.CurrentLocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class HomeFragment extends Fragment {
 
@@ -134,21 +142,95 @@ public class HomeFragment extends Fragment {
         sosButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MediSportPrefs", Context.MODE_PRIVATE);
-                String phoneNumber = sharedPreferences.getString("sos_phone", "0");
-
-                String message = "Achtung! Ich brauche hilfe!";
-
-                Uri uri = Uri.parse("smsto:" + phoneNumber);
-                Intent intent = new Intent(Intent.ACTION_SENDTO, uri);
-                intent.putExtra("sms_body", message);
-
-                // Uruchamiamy aplikację
-                startActivity(intent);
+                sendSosWithLocation();
             }
         });
 
         return view;
+    }
+
+    private void sendSosWithLocation() {
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 100);
+            Toast.makeText(getContext(), "Brak uprawnień do lokalizacji! Spróbuj ponownie po ich przyznaniu.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Sprawdź czy lokalizacja jest włączona w systemie
+        android.location.LocationManager lm = (android.location.LocationManager) requireContext().getSystemService(Context.LOCATION_SERVICE);
+        boolean gpsEnabled = false;
+        try {
+            gpsEnabled = lm.isProviderEnabled(android.location.LocationManager.GPS_PROVIDER);
+        } catch (Exception ignored) {}
+
+        if (!gpsEnabled) {
+            showLocationSettingsDialog();
+            return;
+        }
+
+        Toast.makeText(getContext(), "Pobieram lokalizację...", Toast.LENGTH_SHORT).show();
+
+        com.google.android.gms.location.FusedLocationProviderClient client = LocationServices.getFusedLocationProviderClient(requireActivity());
+
+        // KROK 1: Pobierz ostatnią znaną lokalizację (jest natychmiastowa)
+        client.getLastLocation().addOnSuccessListener(lastLocation -> {
+            // Jeśli ostatnia lokalizacja jest świeża (np. sprzed minuty), wyślij ją od razu
+            if (lastLocation != null && (System.currentTimeMillis() - lastLocation.getTime() < 60000)) {
+                sendSosSms(lastLocation);
+            } else {
+                // KROK 2: Jeśli nie ma świeżej "ostatniej", wymuś pobranie nowej
+                CurrentLocationRequest request = new CurrentLocationRequest.Builder()
+                        .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
+                        .setDurationMillis(10000) // Czekaj max 10 sekund
+                        .build();
+
+                client.getCurrentLocation(request, null).addOnCompleteListener(task -> {
+                    Location freshLocation = task.isSuccessful() ? task.getResult() : null;
+                    if (freshLocation != null) {
+                        sendSosSms(freshLocation);
+                    } else if (lastLocation != null) {
+                        // Jeśli nowa się nie udała, użyj starej (lepsze to niż nic)
+                        sendSosSms(lastLocation);
+                    } else {
+                        sendSms("Achtung! Ich brauche Hilfe! (Lokalizacja niedostępna - sprawdź GPS)");
+                    }
+                });
+            }
+        }).addOnFailureListener(e -> {
+            sendSms("Achtung! Ich brauche Hilfe! (Błąd GPS)");
+        });
+    }
+
+    private void showLocationSettingsDialog() {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Lokalizacja jest wyłączona")
+                .setMessage("Aby wysłać Twoje współrzędne w wezwaniu SOS, musisz włączyć lokalizację (GPS) w ustawieniach telefonu.")
+                .setPositiveButton("Ustawienia", (dialog, which) -> {
+                    Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    startActivity(intent);
+                })
+                .setNegativeButton("Wyślij bez GPS", (dialog, which) -> {
+                    sendSms("Achtung! Ich brauche Hilfe! (Lokalizacja wyłączona przez użytkownika)");
+                })
+                .show();
+    }
+
+    private void sendSosSms(Location location) {
+        String message = String.format(Locale.US,
+                "Achtung! Ich brauche Hilfe!\nMeine Koordinaten: %.6f, %.6f\nhttps://www.google.com/maps?q=%.6f,%.6f",
+                location.getLatitude(), location.getLongitude(),
+                location.getLatitude(), location.getLongitude());
+        sendSms(message);
+    }
+
+    private void sendSms(String message) {
+        SharedPreferences sharedPrefs = requireActivity().getSharedPreferences("MediSportPrefs", Context.MODE_PRIVATE);
+        String phoneNumber = sharedPrefs.getString("sos_phone", "0");
+
+        Uri uri = Uri.parse("smsto:" + phoneNumber);
+        Intent intent = new Intent(Intent.ACTION_SENDTO, uri);
+        intent.putExtra("sms_body", message);
+        startActivity(intent);
     }
 
     private void loadStepGoal() {

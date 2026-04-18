@@ -7,10 +7,15 @@ import android.content.SharedPreferences;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.os.LocaleListCompat;
 
+import com.google.firebase.FirebaseApp;
+
 public class BaseApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        
+        // Inicjalizacja Firebase
+        FirebaseApp.initializeApp(this);
         
         SharedPreferences prefs = getSharedPreferences("MediSportPrefs", Context.MODE_PRIVATE);
         
