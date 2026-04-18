@@ -152,7 +152,7 @@ public class HomeFragment extends Fragment {
     private void sendSosWithLocation() {
         if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 100);
-            Toast.makeText(getContext(), "Brak uprawnień do lokalizacji! Spróbuj ponownie po ich przyznaniu.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getString(R.string.sos_no_permission), Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -168,7 +168,7 @@ public class HomeFragment extends Fragment {
             return;
         }
 
-        Toast.makeText(getContext(), "Pobieram lokalizację...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), getString(R.string.sos_fetching_location), Toast.LENGTH_SHORT).show();
 
         com.google.android.gms.location.FusedLocationProviderClient client = LocationServices.getFusedLocationProviderClient(requireActivity());
 
@@ -192,25 +192,25 @@ public class HomeFragment extends Fragment {
                         // Jeśli nowa się nie udała, użyj starej (lepsze to niż nic)
                         sendSosSms(lastLocation);
                     } else {
-                        sendSms("Achtung! Ich brauche Hilfe! (Lokalizacja niedostępna - sprawdź GPS)");
+                        sendSms(getString(R.string.sos_location_unavailable));
                     }
                 });
             }
         }).addOnFailureListener(e -> {
-            sendSms("Achtung! Ich brauche Hilfe! (Błąd GPS)");
+            sendSms("SOS Error (GPS)");
         });
     }
 
     private void showLocationSettingsDialog() {
         new AlertDialog.Builder(requireContext())
-                .setTitle("Lokalizacja jest wyłączona")
-                .setMessage("Aby wysłać Twoje współrzędne w wezwaniu SOS, musisz włączyć lokalizację (GPS) w ustawieniach telefonu.")
-                .setPositiveButton("Ustawienia", (dialog, which) -> {
+                .setTitle(getString(R.string.sos_location_disabled_title))
+                .setMessage(getString(R.string.sos_location_disabled_message))
+                .setPositiveButton(getString(R.string.sos_location_settings), (dialog, which) -> {
                     Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                     startActivity(intent);
                 })
-                .setNegativeButton("Wyślij bez GPS", (dialog, which) -> {
-                    sendSms("Achtung! Ich brauche Hilfe! (Lokalizacja wyłączona przez użytkownika)");
+                .setNegativeButton(getString(R.string.sos_send_without_gps), (dialog, which) -> {
+                    sendSms(getString(R.string.sos_disabled_by_user));
                 })
                 .show();
     }

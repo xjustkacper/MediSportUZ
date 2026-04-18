@@ -99,6 +99,16 @@
     <string name="lang_pl">PL</string>
     <string name="lang_en">EN</string>
 
+    <!-- SOS Dialog -->
+    <string name="sos_location_disabled_title">Lokalizacja jest wyłączona</string>
+    <string name="sos_location_disabled_message">Aby wysłać Twoje współrzędne w wezwaniu SOS, musisz włączyć lokalizację (GPS) w ustawieniach telefonu.</string>
+    <string name="sos_location_settings">Ustawienia</string>
+    <string name="sos_send_without_gps">Wyślij bez GPS</string>
+    <string name="sos_disabled_by_user">Lokalizacja wyłączona przez użytkownika</string>
+    <string name="sos_no_permission">Brak uprawnień do lokalizacji!</string>
+    <string name="sos_fetching_location">Pobieranie lokalizacji…</string>
+    <string name="sos_location_unavailable">Lokalizacja niedostępna</string>
+
     <!-- Auth Messages -->
     <string name="auth_empty_fields">Wypełnij wszystkie pola</string>
     <string name="auth_password_short">Hasło musi mieć min. 6 znaków</string>
