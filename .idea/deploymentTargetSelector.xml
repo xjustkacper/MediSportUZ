@@ -21,7 +21,13 @@
           </targets>
         </DialogSelection>
       </SelectionState>
-      <SelectionState runConfigName="useAppContext()">
+      <SelectionState runConfigName="LoginActivityTest">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="testLanguageSwitch()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="LoginFlowTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

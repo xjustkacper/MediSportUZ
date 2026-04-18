@@ -12,7 +12,7 @@ public class WeatherCodeHelper {
         if (code <= 69)            return "Deszcz";
         if (code <= 79)            return "Śnieg";
         if (code <= 84)            return "Przelotny deszcz";
-        if (code <= 94)            return "Burza";
+        if (code <= 95)            return "Burza";
         return "Burza z gradem";
     }
 
