@@ -25,7 +25,7 @@ public class IntroActivity extends AppCompatActivity {
         videoView.start();
 
         videoView.setOnCompletionListener(mp -> {
-            Intent intent = new Intent(IntroActivity.this, MainActivity.class);
+            Intent intent = new Intent(IntroActivity.this, LoginActivity.class);
             startActivity(intent);
             finish();
         });
