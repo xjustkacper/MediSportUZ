@@ -34,19 +34,39 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
+/**
+ * @brief Fragment odpowiedzialny za zarządzanie listą notatek użytkownika.
+ * * Umożliwia wyświetlanie, dodawanie, edycję oraz usuwanie notatek korzystając
+ * z lokalnej bazy danych (poprzez NoteRepository). Dodatkowo implementuje funkcjonalność
+ * udostępniania treści notatek przy użyciu standardowego menu udostępniania systemu Android
+ * oraz bezpośrednio przez moduł Bluetooth (z wykorzystaniem protokołu SPP).
+ */
 public class NotesFragment extends Fragment implements NotesAdapter.OnNoteClickListener {
 
     // SPP UUID — standardowy dla Bluetooth Classic
+    /**
+     * @brief Standardowy identyfikator UUID dla usługi Serial Port Profile (SPP) w Bluetooth Classic.
+     * Wykorzystywany do nawiązywania połączeń strumieniowych pomiędzy urządzeniami.
+     */
     private static final UUID BT_SPP_UUID =
             UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     private NotesAdapter adapter;
     private NoteRepository repository;
+    /**
+     * @brief Handler powiązany z głównym wątkiem aplikacji (UI thread).
+     * Służy do bezpiecznego wyświetlania komunikatów (np. Toast) z wątków roboczych (tła).
+     */
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    /** Kod żądania uprawnień dla funkcji Bluetooth. */
     private static final int BT_PERMISSION_REQUEST = 1002;
+    /** Tymczasowo przechowuje notatkę, która ma zostać udostępniona po przyznaniu uprawnień Bluetooth. */
     private Note pendingShareNote;
-
+    /**
+     * @brief Inicjalizuje widok fragmentu, konfiguruje listę (RecyclerView) i obserwuje dane.
+     * * Metoda ta łączy widok z adapterem i powołuje do życia repozytorium. Nasłuchuje również
+     * na zmiany w tabeli notatek (LiveData), automatycznie odświeżając UI po dodaniu lub usunięciu danych.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -74,6 +94,11 @@ public class NotesFragment extends Fragment implements NotesAdapter.OnNoteClickL
 
         return view;
     }
+    /**
+     * @brief Obsługuje wynik żądania uprawnień systemowych (szczególnie dla Bluetooth w Android 12+).
+     * * Jeśli użytkownik przyzna uprawnienia, aplikacja wznawia próbę udostępnienia notatki
+     * zapisanej w zmiennej pendingShareNote. W przeciwnym razie wyświetla komunikat o błędzie.
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions,
@@ -92,7 +117,13 @@ public class NotesFragment extends Fragment implements NotesAdapter.OnNoteClickL
     // ────────────────────────────────────────────────────────────────────────
     //  Dialog tworzenia / edycji notatki
     // ────────────────────────────────────────────────────────────────────────
-
+    /**
+     * @brief Wyświetla okno dialogowe umożliwiające utworzenie nowej lub edycję istniejącej notatki.
+     * * Okno zawiera pola na tytuł, treść oraz rozwijaną listę (Spinner) z kategoriami.
+     * Po zatwierdzeniu formularza, dane są walidowane, a następnie zapisywane do bazy
+     * za pomocą repozytorium.
+     * * @param existingNote Obiekt notatki do edycji. Jeśli przekazano null, tworzona jest nowa notatka.
+     */
     private void showNoteDialog(@Nullable Note existingNote) {
         View dialogView = LayoutInflater.from(getContext())
                 .inflate(R.layout.dialog_note, null);
@@ -157,12 +188,17 @@ public class NotesFragment extends Fragment implements NotesAdapter.OnNoteClickL
     // ────────────────────────────────────────────────────────────────────────
     //  Akcje z adaptera
     // ────────────────────────────────────────────────────────────────────────
-
+    /**
+     * @brief Wywoływana z poziomu adaptera w celu edycji wskazanej notatki.
+     */
     @Override
     public void onEdit(Note note) {
         showNoteDialog(note);
     }
-
+    /**
+     * @brief Wywoływana z poziomu adaptera w celu usunięcia wskazanej notatki.
+     * * Wyświetla okno dialogowe z prośbą o potwierdzenie akcji przed trwałym usunięciem z bazy.
+     */
     @Override
     public void onDelete(Note note) {
         new AlertDialog.Builder(requireContext())
@@ -173,7 +209,11 @@ public class NotesFragment extends Fragment implements NotesAdapter.OnNoteClickL
                 .setNegativeButton("Anuluj", null)
                 .show();
     }
-
+    /**
+     * @brief Wywoływana z poziomu adaptera w celu udostępnienia wskazanej notatki.
+     * * Daje użytkownikowi wybór pomiędzy transmisją bezpośrednio przez Bluetooth,
+     * a użyciem domyślnego mechanizmu udostępniania w systemie Android.
+     */
     @Override
     public void onShare(Note note) {
         // Pokaż wybór: Bluetooth lub systemowy share
@@ -189,7 +229,10 @@ public class NotesFragment extends Fragment implements NotesAdapter.OnNoteClickL
     // ────────────────────────────────────────────────────────────────────────
     //  Udostępnianie przez system (Intent)
     // ────────────────────────────────────────────────────────────────────────
-
+    /**
+     * @brief Przekazuje tekst notatki do innych aplikacji w systemie za pomocą intencji.
+     * @param note Notatka, której treść ma zostać udostępniona.
+     */
     private void shareViaSystem(Note note) {
         String text = note.title + "\n\n" + note.content;
         Intent intent = new Intent(Intent.ACTION_SEND);
@@ -201,7 +244,13 @@ public class NotesFragment extends Fragment implements NotesAdapter.OnNoteClickL
     // ────────────────────────────────────────────────────────────────────────
     //  Udostępnianie przez Bluetooth Classic (SPP)
     // ────────────────────────────────────────────────────────────────────────
-
+    /**
+     * @brief Inicjuje proces udostępniania notatki przez moduł Bluetooth.
+     * * Metoda sprawdza dostępność modułu, weryfikuje jego włączenie oraz sprawdza uprawnienia.
+     * Jeżeli wszystko jest gotowe, pobiera listę sparowanych urządzeń i wyświetla je
+     * w oknie dialogowym.
+     * * @param note Notatka do przesłania.
+     */
     private void shareViaBluetooth(Note note) {
         BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -246,7 +295,14 @@ public class NotesFragment extends Fragment implements NotesAdapter.OnNoteClickL
                         sendNoteViaBluetooth(devices[which], note))
                 .show();
     }
-
+    /**
+     * @brief Nawiązuje połączenie i przesyła tekst notatki do wybranego urządzenia Bluetooth.
+     * * Operacje sieciowe (tworzenie gniazda, wysyłanie danych) blokują wątek, dlatego
+     * całość wykonywana jest asynchronicznie w nowym wątku roboczym. Wynik operacji
+     * (sukces/błąd) jest przekazywany do głównego wątku za pomocą obiektu Handler.
+     * * @param device Docelowe urządzenie Bluetooth (sparowane).
+     * @param note Notatka, która zostanie przekonwertowana na strumień bajtów i wysłana.
+     */
     private void sendNoteViaBluetooth(BluetoothDevice device, Note note) {
         // Sprawdź uprawnienie raz na początku — obejmuje getName() i connect()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&

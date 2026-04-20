@@ -46,7 +46,15 @@ import com.google.android.gms.location.Priority;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-
+/**
+ * @brief Główny fragment aplikacji (Dashboard), wyświetlany po zalogowaniu.
+ * * Odpowiada za integrację kluczowych funkcji ekranu domowego:
+ * - Powitanie użytkownika danymi pobranymi z Firebase.
+ * - Wyświetlanie statystyk krokomierza (kroki, dystans, kalorie) i paska postępu.
+ * - Wyświetlanie reklam Google AdMob.
+ * - Obsługę przycisku awaryjnego (SOS), który pobiera dokładną lokalizację GPS
+ * i przekierowuje ją do aplikacji SMS.
+ */
 public class HomeFragment extends Fragment {
 
     private static final String TAG = "HomeFragment";
@@ -58,10 +66,19 @@ public class HomeFragment extends Fragment {
     private TextView caloriesTextView;
     private CircularProgressIndicator stepProgressBar;
     private AdView adView;
-
+    /**
+     * @brief Cel kroków na dany dzień, domyślnie ustawiony na 10000.
+     */
     private int stepGoal = 10000;
+    /**
+     * @brief Obiekt SharedPreferences do odczytu i zapisu lokalnych ustawień (np. cel kroków).
+     */
     private SharedPreferences sharedPreferences;
-
+    /**
+     * @brief Odbiornik zdarzeń (BroadcastReceiver) nasłuchujący aktualizacji kroków.
+     * * Odbiera intencje (Intents) od StepCounterService i wywołuje metodę aktualizującą
+     * interfejs graficzny w czasie rzeczywistym.
+     */
     private final BroadcastReceiver stepReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -71,7 +88,9 @@ public class HomeFragment extends Fragment {
             }
         }
     };
-
+    /**
+     * @brief Launcher obsługujący zapytania o uprawnienia systemowe (Activity Recognition i powiadomienia).
+     */
     private final ActivityResultLauncher<String[]> requestPermissionsLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
                 Boolean activityGranted = result.getOrDefault(Manifest.permission.ACTIVITY_RECOGNITION, false);
@@ -81,7 +100,11 @@ public class HomeFragment extends Fragment {
                     Toast.makeText(getContext(), "Brak uprawnień do kroków!", Toast.LENGTH_SHORT).show();
                 }
             });
-
+    /**
+     * @brief Inicjalizuje widok fragmentu, powiązuje kontrolki UI oraz ładuje dane startowe.
+     * * Pobiera dane użytkownika z Firebase, ustawia kontrolki krokomierza, inicjalizuje
+     * reklamy AdMob oraz podpina logikę do przycisku SOS.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -148,7 +171,12 @@ public class HomeFragment extends Fragment {
 
         return view;
     }
-
+    /**
+     * @brief Sprawdza uprawnienia do lokalizacji i próbuje wysłać wiadomość SOS.
+     * * Weryfikuje, czy włączony jest GPS. Następnie używa FusedLocationProviderClient
+     * w celu pozyskania ostatniej znanej lub bieżącej lokalizacji użytkownika,
+     * po czym deleguje wysłanie SMS-a.
+     */
     private void sendSosWithLocation() {
         if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 100);
@@ -200,7 +228,11 @@ public class HomeFragment extends Fragment {
             sendSms("SOS Error (GPS)");
         });
     }
-
+    /**
+     * @brief Wyświetla okno dialogowe informujące użytkownika o wyłączonej lokalizacji.
+     * * Daje możliwość przejścia bezpośrednio do ustawień urządzenia, aby włączyć GPS,
+     * lub wysłania wiadomości SOS bez współrzędnych.
+     */
     private void showLocationSettingsDialog() {
         new AlertDialog.Builder(requireContext())
                 .setTitle(getString(R.string.sos_location_disabled_title))
@@ -214,7 +246,11 @@ public class HomeFragment extends Fragment {
                 })
                 .show();
     }
-
+    /**
+     * @brief Formatuje wiadomość SOS zawierającą współrzędne geograficzne i wywołuje wysyłanie.
+     * * Generuje link do Map Google z przypiętą pinezką.
+     * * @param location Obiekt Location zawierający szerokość i długość geograficzną.
+     */
     private void sendSosSms(Location location) {
         String message = String.format(Locale.US,
                 "Achtung! Ich brauche Hilfe!\nMeine Koordinaten: %.6f, %.6f\nhttps://www.google.com/maps?q=%.6f,%.6f",
@@ -222,7 +258,11 @@ public class HomeFragment extends Fragment {
                 location.getLatitude(), location.getLongitude());
         sendSms(message);
     }
-
+    /**
+     * @brief Uruchamia zewnętrzną aplikację do wysyłania SMS.
+     * * Pobiera skonfigurowany numer telefonu z SharedPreferences i otwiera systemowy ekran SMS.
+     * * @param message Gotowa treść wiadomości tekstowej do wysłania.
+     */
     private void sendSms(String message) {
         SharedPreferences sharedPrefs = requireActivity().getSharedPreferences("MediSportPrefs", Context.MODE_PRIVATE);
         String phoneNumber = sharedPrefs.getString("sos_phone", "0");
@@ -232,7 +272,10 @@ public class HomeFragment extends Fragment {
         intent.putExtra("sms_body", message);
         startActivity(intent);
     }
-
+    /**
+     * @brief Wczytuje zdefiniowany przez użytkownika cel kroków z ustawień lokalnych.
+     * W razie błędu parsowania przypisuje wartość domyślną 10000.
+     */
     private void loadStepGoal() {
         String goalStr = sharedPreferences.getString("step_goal", "10000");
         try {
@@ -241,7 +284,10 @@ public class HomeFragment extends Fragment {
             stepGoal = 10000;
         }
     }
-
+    /**
+     * @brief Sprawdza i w razie potrzeby prosi o uprawnienia niezbędne do działania krokomierza.
+     * Wymaga ACTIVITY_RECOGNITION oraz (dla Androida 13+) POST_NOTIFICATIONS.
+     */
     private void checkPermissionsAndStartService() {
         List<String> permissionsNeeded = new ArrayList<>();
 
@@ -263,12 +309,18 @@ public class HomeFragment extends Fragment {
             requestPermissionsLauncher.launch(permissionsNeeded.toArray(new String[0]));
         }
     }
-
+    /**
+     * @brief Uruchamia Foreground Service zliczający kroki w tle.
+     */
     private void startStepService() {
         Intent serviceIntent = new Intent(requireContext(), StepCounterService.class);
         ContextCompat.startForegroundService(requireContext(), serviceIntent);
     }
-
+    /**
+     * @brief Aktualizuje interfejs użytkownika na podstawie najnowszej liczby kroków.
+     * * Przelicza dystans, spalone kalorie i rysuje pasek postępu względem celu.
+     * * @param steps Aktualna liczba wykonanych kroków.
+     */
     private void updateUI(int steps) {
         if (stepCountTextView != null) {
             stepCountTextView.setText(getString(R.string.home_steps_count_format, steps));
@@ -291,7 +343,11 @@ public class HomeFragment extends Fragment {
             caloriesTextView.setText(getString(R.string.home_calories_format, calories));
         }
     }
-
+    /**
+     * @brief Wywoływana gdy fragment staje się widoczny i aktywny (onResume).
+     * * Odświeża cel, wymusza ewentualne uruchomienie serwisu kroków
+     * i rejestruje lokalny BroadcastReceiver.
+     */
     @Override
     public void onResume() {
         super.onResume();
@@ -312,7 +368,10 @@ public class HomeFragment extends Fragment {
         // Using ContextCompat to handle RECEIVER_NOT_EXPORTED on all API levels for Android 14+ security
         ContextCompat.registerReceiver(requireContext(), stepReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
     }
-
+    /**
+     * @brief Wywoływana, gdy fragment traci skupienie lub przechodzi w tło (onPause).
+     * * Bezpiecznie wyrejestrowuje BroadcastReceiver, aby zapobiec wyciekom pamięci.
+     */
     @Override
     public void onPause() {
         super.onPause();

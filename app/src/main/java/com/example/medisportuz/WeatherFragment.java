@@ -29,9 +29,16 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-
+/**
+ * @brief Fragment odpowiedzialny za wyświetlanie aktualnej pogody oraz krótkoterminowej prognozy.
+ * * Klasa ta łączy się z zewnętrznymi usługami sieciowymi za pomocą biblioteki Retrofit.
+ * Realizuje dwuetapowy proces pobierania danych: najpierw zamienia wpisaną nazwę miasta
+ * na współrzędne geograficzne (Geocoding API), a następnie pobiera dla nich dane
+ * meteorologiczne (Open-Meteo API). Dodatkowo umożliwia pobranie pogody na podstawie
+ * bieżącej lokalizacji GPS urządzenia.
+ */
 public class WeatherFragment extends Fragment {
-
+    /** Kod żądania (Request Code) używany podczas pytania użytkownika o uprawnienia do lokalizacji. */
     private static final int LOCATION_PERMISSION_REQUEST = 1001;
 
     // ── Aktualna pogoda ──
@@ -59,9 +66,18 @@ public class WeatherFragment extends Fragment {
     private OpenMeteoApiService weatherApi;
     private GeocodingApiService geoApi;
 
-    // ── Zapamiętane miasto (do wyświetlenia nazwy po geokodowaniu) ──
+    /** * @brief Zmienna przechowująca nazwę aktualnie przeglądanego miasta.
+     * Jest używana do wyświetlenia odpowiedniej nazwy po pomyślnym zakończeniu geokodowania lub użyciu GPS.
+     */
     private String currentCityName = "";
-
+    /**
+     * @brief Inicjalizuje widok fragmentu, komponenty UI, klientów sieciowych oraz ładuje domyślne dane.
+     *
+     * @param inflater Obiekt tworzący widok na podstawie pliku XML.
+     * @param container Rodzic, do którego podpięty będzie fragment.
+     * @param savedInstanceState Zapisany stan instancji (nieużywany w tym fragmencie).
+     * @return Widok zainicjalizowanego fragmentu.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -82,7 +98,10 @@ public class WeatherFragment extends Fragment {
     // ────────────────────────────────────────────────────────────────────────
     //  Inicjalizacja
     // ────────────────────────────────────────────────────────────────────────
-
+    /**
+     * @brief Wiąże zmienne referencyjne z odpowiednimi elementami interfejsu (widokami) z pliku XML.
+     * @param view Główny widok fragmentu wygenerowany w onCreateView.
+     */
     private void initViews(View view) {
         cityName    = view.findViewById(R.id.weatherCityName);
         temperature = view.findViewById(R.id.weatherTemperature);
@@ -108,7 +127,10 @@ public class WeatherFragment extends Fragment {
         day3TempMin = view.findViewById(R.id.forecastDay3TempMin);
         day3Icon    = view.findViewById(R.id.forecastDay3Icon);
     }
-
+    /**
+     * @brief Konfiguruje i buduje instancje klientów Retrofit dla obu wykorzystywanych API.
+     * Wykorzystuje bibliotekę Gson do automatycznej deserializacji odpowiedzi z formatu JSON.
+     */
     private void initRetrofit() {
         weatherApi = new Retrofit.Builder()
                 .baseUrl(OpenMeteoApiService.BASE_URL)
@@ -122,7 +144,11 @@ public class WeatherFragment extends Fragment {
                 .build()
                 .create(GeocodingApiService.class);
     }
-
+    /**
+     * @brief Konfiguruje nasłuchiwacze zdarzeń (Listenery) dla przycisków i pól tekstowych.
+     * * Obsługuje kliknięcie przycisku "Szukaj", wciśnięcie klawisza "Enter/Szukaj"
+     * na klawiaturze ekranowej oraz kliknięcie przycisku lokalizacji GPS.
+     */
     private void setupListeners() {
         searchButton.setOnClickListener(v -> searchCity());
 
@@ -141,7 +167,9 @@ public class WeatherFragment extends Fragment {
     // ────────────────────────────────────────────────────────────────────────
     //  Geokodowanie → pobieranie pogody
     // ────────────────────────────────────────────────────────────────────────
-
+    /**
+     * @brief Waliduje i inicjuje proces wyszukiwania miasta z paska tekstowego.
+     */
     private void searchCity() {
         String query = searchInput.getText().toString().trim();
         if (query.isEmpty()) {
@@ -151,7 +179,14 @@ public class WeatherFragment extends Fragment {
         geocodeAndFetch(query);
     }
 
-    /** Krok 1: zamień nazwę miasta na współrzędne */
+    /**
+     * @brief Krok 1 zapytania sieciowego: Geokodowanie.
+     * * Wysyła asynchroniczne zapytanie do Geocoding API w celu zamiany wpisanej
+     * nazwy miasta na współrzędne geograficzne (szerokość i długość). W przypadku
+     * sukcesu uruchamia Krok 2 (pobieranie pogody).
+     *
+     * @param cityQuery Nazwa miasta wpisana przez użytkownika.
+     */
     private void geocodeAndFetch(String cityQuery) {
         geoApi.searchCity(cityQuery, 1, "pl").enqueue(new Callback<GeocodingResponse>() {
             @Override
@@ -180,7 +215,14 @@ public class WeatherFragment extends Fragment {
         });
     }
 
-    /** Krok 2: pobierz pogodę dla danych współrzędnych */
+    /**
+     * @brief Krok 2 zapytania sieciowego: Pobieranie parametrów meteorologicznych.
+     * * Kontaktuje się z Open-Meteo API dla zadanych współrzędnych geograficznych,
+     * aby pobrać zbiór danych dla bieżących warunków i prognozy wielodniowej.
+     *
+     * @param lat Szerokość geograficzna.
+     * @param lon Długość geograficzna.
+     */
     private void fetchWeather(double lat, double lon) {
         weatherApi.getForecast(
                 lat, lon,
@@ -211,7 +253,12 @@ public class WeatherFragment extends Fragment {
     // ────────────────────────────────────────────────────────────────────────
     //  GPS
     // ────────────────────────────────────────────────────────────────────────
-
+    /**
+     * @brief Sprawdza uprawnienia i pozyskuje ostatnią znaną lokalizację użytkownika.
+     * * Jeżeli uprawnienia (ACCESS_FINE_LOCATION) nie zostały wcześniej przyznane,
+     * metoda przerywa działanie i wywołuje systemowy dialog z prośbą o ich nadanie.
+     * Po uzyskaniu koordynat, bezpośrednio wywołuje metodę fetchWeather.
+     */
     private void fetchByGps() {
         if (ActivityCompat.checkSelfPermission(requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -233,7 +280,14 @@ public class WeatherFragment extends Fragment {
                     }
                 });
     }
-
+    /**
+     * @brief Metoda wywoływana przez system (Callback) natychmiast po tym, jak użytkownik
+     * odpowie na prośbę o nadanie uprawnień (np. do odczytu lokalizacji).
+     *
+     * @param requestCode Kod żądania (Request Code) przekazany w metodzie requestPermissions.
+     * @param permissions Tablica uprawnień, o które poproszono.
+     * @param grantResults Tablica rezultatów powiązana z powyższymi uprawnieniami (GRANTED lub DENIED).
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions,
@@ -248,7 +302,13 @@ public class WeatherFragment extends Fragment {
     // ────────────────────────────────────────────────────────────────────────
     //  Aktualizacja UI
     // ────────────────────────────────────────────────────────────────────────
-
+    /**
+     * @brief Wypełnia komponenty interfejsu (widoki) aktualnymi danymi pogody.
+     * * Obsługuje zarówno sekcję pogody na ten moment (Bieżąca), jak i wywołuje
+     * pomocniczą metodę dla paneli prognozy długoterminowej.
+     *
+     * @param data Obiekt zawierający zdeserializowane dane z API Open-Meteo.
+     */
     private void updateUI(OpenMeteoResponse data) {
         // ── Aktualna pogoda ──
         cityName.setText(currentCityName);
@@ -264,7 +324,18 @@ public class WeatherFragment extends Fragment {
             updateForecastDay(day3Name, day3Icon, day3TempMax, day3TempMin, data, 3);
         }
     }
-
+    /**
+     * @brief Zewnętrzna metoda pomocnicza wypełniająca pojedynczą kartę (dzień) prognozy pogody.
+     * * Zastosowanie tej metody pozwala na uniknięcie powielania kodu (zasada DRY) podczas
+     * aktualizowania widoków dla dnia drugiego, trzeciego itd.
+     *
+     * @param nameView Kontrolka TextView dla skróconej nazwy dnia tygodnia (np. "pn", "wt").
+     * @param iconView Kontrolka ImageView dla graficznej ikony pogody.
+     * @param maxView Kontrolka TextView dla prognozowanej temperatury maksymalnej.
+     * @param minView Kontrolka TextView dla prognozowanej temperatury minimalnej.
+     * @param data Obiekt całej odpowiedzi z API.
+     * @param index Indeks w tablicy wynikowej reprezentujący docelowy dzień.
+     */
     private void updateForecastDay(TextView nameView, ImageView iconView,
                                    TextView maxView, TextView minView,
                                    OpenMeteoResponse data, int index) {
