@@ -16,14 +16,30 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.Random;
-
+/**
+ * @brief Aktywność odpowiedzialna za proces logowania użytkownika do aplikacji.
+ * * Klasa ta integruje uwierzytelnianie Firebase (FirebaseAuth) za pomocą adresu e-mail
+ * i hasła. Zawiera również wbudowany, lokalny mechanizm CAPTCHA zapobiegający
+ * zautomatyzowanym próbom logowania, a także obsługuje proces odzyskiwania hasła.
+ */
 public class LoginActivity extends AppCompatActivity {
-
+    /**
+     * @brief Główny obiekt dostępu do usług uwierzytelniania Firebase.
+     */
     private FirebaseAuth mAuth;
     private TextInputEditText emailInput, passwordInput, captchaInput;
     private TextView captchaText;
+    /**
+     * @brief Przechowuje aktualnie wygenerowany, prawidłowy ciąg znaków CAPTCHA.
+     */
     private String currentCaptcha;
-
+    /**
+     * @brief Inicjalizuje aktywność, widoki oraz ustawia nasłuchiwacze zdarzeń.
+     * * Metoda ta wywoływana jest przy tworzeniu aktywności. Konfiguruje Firebase,
+     * przypisuje widoki do zmiennych, generuje pierwszą zagadkę CAPTCHA oraz
+     * podpina akcje pod przyciski logowania, rejestracji i resetowania hasła.
+     * * @param savedInstanceState Stan zapisany z poprzedniej instancji aktywności (jeśli istnieje).
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +70,12 @@ public class LoginActivity extends AppCompatActivity {
 
         forgotPassword.setOnClickListener(v -> showResetPasswordDialog());
     }
-
+    /**
+     * @brief Sprawdza status sesji użytkownika przy każdym uruchomieniu aktywności.
+     * * Jeśli użytkownik jest już zalogowany i jego adres e-mail został zweryfikowany,
+     * następuje automatyczne przekierowanie do głównego ekranu aplikacji (MainActivity),
+     * pomijając ekran logowania.
+     */
     @Override
     protected void onStart() {
         super.onStart();
@@ -63,7 +84,12 @@ public class LoginActivity extends AppCompatActivity {
             goToMain();
         }
     }
-
+    /**
+     * @brief Generuje nowy, 5-znakowy kod CAPTCHA i aktualizuje interfejs.
+     * * Wykorzystuje zdefiniowany zbiór znaków, celowo pomijając znaki łatwe do
+     * pomylenia (np. '0', 'O', '1', 'I', 'l'). Wygenerowany ciąg jest wyświetlany
+     * na ekranie i przypisywany do zmiennej currentCaptcha w celu późniejszej weryfikacji.
+     */
     private void generateCaptcha() {
         String chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
         StringBuilder sb = new StringBuilder();
@@ -78,7 +104,15 @@ public class LoginActivity extends AppCompatActivity {
             captchaInput.setText("");
         }
     }
-
+    /**
+     * @brief Przeprowadza walidację formularza i próbuje zalogować użytkownika.
+     * * Proces obejmuje:
+     * 1. Sprawdzenie, czy żadne z pól (e-mail, hasło, CAPTCHA) nie jest puste.
+     * 2. Weryfikację poprawności wpisanego kodu CAPTCHA.
+     * 3. Wysłanie zapytania logowania do Firebase Auth.
+     * 4. Sprawdzenie, czy adres e-mail przypisany do konta został pomyślnie zweryfikowany.
+     * W przypadku niepowodzenia na którymkolwiek etapie, generowany jest nowy kod CAPTCHA.
+     */
     private void loginUser() {
         String email = emailInput.getText() != null ? emailInput.getText().toString().trim() : "";
         String password = passwordInput.getText() != null ? passwordInput.getText().toString().trim() : "";
@@ -115,7 +149,13 @@ public class LoginActivity extends AppCompatActivity {
                     generateCaptcha();
                 });
     }
-
+    /**
+     * @brief Wyświetla okno dialogowe umożliwiające reset hasła.
+     * * Tworzy dynamiczny AlertDialog z polem tekstowym na adres e-mail.
+     * Jeśli w głównym oknie logowania wpisano już e-mail, pole to zostaje
+     * nim automatycznie wypełnione. Po zatwierdzeniu wysyła link resetujący
+     * na podany adres za pośrednictwem Firebase.
+     */
     private void showResetPasswordDialog() {
         EditText emailField = new EditText(this);
         emailField.setHint(R.string.login_email_hint);
@@ -151,7 +191,11 @@ public class LoginActivity extends AppCompatActivity {
                 .setNegativeButton(R.string.auth_reset_cancel, null)
                 .show();
     }
-
+    /**
+     * @brief Przenosi użytkownika do głównego ekranu aplikacji i kończy aktualną aktywność.
+     * * Używane po pomyślnym zalogowaniu (lub gdy użytkownik był już zalogowany),
+     * zapobiegając możliwości powrotu do ekranu logowania za pomocą przycisku "Wstecz".
+     */
     private void goToMain() {
         startActivity(new Intent(LoginActivity.this, MainActivity.class));
         finish();

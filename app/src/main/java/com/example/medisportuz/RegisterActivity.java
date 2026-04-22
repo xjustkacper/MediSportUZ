@@ -20,14 +20,28 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-
+/**
+ * @brief Aktywność odpowiedzialna za proces rejestracji nowego użytkownika.
+ * * Klasa integruje się z usługą Firebase Authentication w celu utworzenia konta
+ * za pomocą adresu e-mail i hasła. Ponadto zapisuje profil użytkownika w usłudze
+ * Firebase Firestore oraz wymusza weryfikację adresu e-mail przed pierwszym logowaniem.
+ * Zabezpieczona jest również lokalnym mechanizmem CAPTCHA.
+ */
 public class RegisterActivity extends AppCompatActivity {
-
+    /**
+     * @brief Główny obiekt dostępu do usług uwierzytelniania Firebase.
+     */
     private FirebaseAuth mAuth;
     private TextInputEditText nameInput, emailInput, passwordInput, repeatPasswordInput, captchaInput;
     private TextView captchaText;
+    /**
+     * @brief Przechowuje aktualnie wygenerowany, prawidłowy ciąg znaków CAPTCHA.
+     */
     private String currentCaptcha;
-
+    /**
+     * @brief Inicjalizuje aktywność, przypisuje widoki i ustawia nasłuchiwacze zdarzeń.
+     * * @param savedInstanceState Stan zapisany z poprzedniej instancji aktywności (jeśli istnieje).
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,7 +75,11 @@ public class RegisterActivity extends AppCompatActivity {
         // Back link — go back to login
         backLink.setOnClickListener(v -> finish());
     }
-
+    /**
+     * @brief Generuje nowy, 5-znakowy kod CAPTCHA i odświeża interfejs.
+     * * Wykorzystuje zdefiniowany zbiór znaków (bez znaków mylących, np. '0', 'O', '1', 'I', 'l').
+     * Jeśli w polu tekstowym wpisano już jakiś kod, jest on czyszczony.
+     */
     private void generateCaptcha() {
         String chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
         StringBuilder sb = new StringBuilder();
@@ -77,7 +95,16 @@ public class RegisterActivity extends AppCompatActivity {
             captchaInput.setText("");
         }
     }
-
+    /**
+     * @brief Przeprowadza walidację danych i rejestruje użytkownika w systemie Firebase.
+     * * Proces składa się z następujących etapów:
+     * 1. Walidacja lokalna (puste pola, długość hasła min. 6 znaków, zgodność haseł, CAPTCHA).
+     * 2. Utworzenie konta w Firebase Auth.
+     * 3. Aktualizacja profilu Auth (ustawienie Display Name).
+     * 4. Zapisanie dodatkowych danych (imię, e-mail, timestamp) do bazy Firestore
+     * w kolekcji "users" pod dokumentem o identyfikatorze (UID) użytkownika.
+     * 5. Wysłanie e-maila weryfikacyjnego.
+     */
     private void registerUser() {
         String name = nameInput.getText() != null ? nameInput.getText().toString().trim() : "";
         String email = emailInput.getText() != null ? emailInput.getText().toString().trim() : "";
@@ -159,7 +186,13 @@ public class RegisterActivity extends AppCompatActivity {
                     }
                 });
     }
-
+    /**
+     * @brief Wysyła link weryfikacyjny na adres e-mail i wylogowuje użytkownika.
+     * * Jest to zabezpieczenie upewniające się, że użytkownik ma dostęp do podanego
+     * adresu e-mail. Ponieważ metoda createUserWithEmailAndPassword automatycznie
+     * loguje użytkownika, konieczne jest wywołanie mAuth.signOut(), aby zablokować
+     * dostęp do aplikacji do czasu kliknięcia w link weryfikacyjny.
+     */
     private void sendVerificationEmail() {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
@@ -177,7 +210,11 @@ public class RegisterActivity extends AppCompatActivity {
                     });
         }
     }
-
+    /**
+     * @brief Przenosi użytkownika do głównego ekranu aplikacji i kończy aktualną aktywność.
+     * * Metoda pomocnicza, do wykorzystania jeśli rejestracja nie wymagałaby weryfikacji e-mail,
+     * lub przy ewentualnym ominięciu wylogowania po rejestracji.
+     */
     private void goToMain() {
         startActivity(new Intent(RegisterActivity.this, MainActivity.class));
         finish();

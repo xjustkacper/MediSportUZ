@@ -23,27 +23,49 @@ import androidx.core.os.LocaleListCompat;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
-
+/**
+ * @brief Fragment odpowiedzialny za ekran ustawień aplikacji.
+ * * Klasa ta umożliwia użytkownikowi personalizację działania aplikacji,
+ * w tym: zmianę celu dziennej liczby kroków, ustawienie numeru alarmowego (SOS),
+ * przełączanie motywu (jasny/ciemny), wybór języka interfejsu oraz bezpieczne wylogowanie z konta.
+ * Wszystkie ustawienia zapisywane są trwale przy użyciu mechanizmu SharedPreferences.
+ */
 public class SettingsFragment extends Fragment {
-
+    /**
+     * @brief Obiekt dostępu do lokalnych preferencji aplikacji.
+     * Używany do zapisywania i odczytywania konfiguracji użytkownika.
+     */
     private SharedPreferences sharedPreferences;
+    /** Pole tekstowe do wprowadzania docelowej dziennej liczby kroków. */
     private TextInputEditText stepGoalInput;
+    /** Pole tekstowe do wprowadzania numeru telefonu alarmowego (SOS). */
     private TextInputEditText sosPhoneInput;
-
+    /**
+     * @brief Inicjalizuje widok ustawień i podpina logikę pod poszczególne elementy interfejsu.
+     * * Metoda ta ładuje aktualne ustawienia z SharedPreferences i wyświetla je w polach.
+     * Definiuje również zachowanie dla przełączników (motyw), list wyboru (język)
+     * oraz przycisków (zapis, wylogowanie).
+     *
+     * @param inflater Obiekt służący do "nadmuchania" widoku XML do postaci obiektu Java.
+     * @param container Rodzicielski kontener, do którego zostanie dołączony widok.
+     * @param savedInstanceState Stan zapisany z poprzedniej instancji (nieużywany w tym fragmencie).
+     * @return Gotowy, zainicjalizowany widok fragmentu ustawień.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
 
         // --- Logika z brancha Krokomierz (Ustawienia celu kroków) ---
+        // Inicjalizacja pliku preferencji o nazwie "MediSportPrefs" w trybie prywatnym
         sharedPreferences = requireActivity().getSharedPreferences("MediSportPrefs", Context.MODE_PRIVATE);
         stepGoalInput = view.findViewById(R.id.settingsStepGoalInput);
         sosPhoneInput = view.findViewById(R.id.settingsSosPhoneInput);
 
-        // Load current values
+        // Wczytanie i wyświetlenie aktualnego celu kroków (domyślnie 10 000)
         String currentGoal = sharedPreferences.getString("step_goal", "10000");
         stepGoalInput.setText(currentGoal);
-
+        // Wczytanie i wyświetlenie zapisanego numeru SOS
         String currentSosPhone = sharedPreferences.getString("sos_phone", "");
         if (!currentSosPhone.isEmpty()) {
             sosPhoneInput.setText(currentSosPhone);
@@ -51,9 +73,10 @@ public class SettingsFragment extends Fragment {
 
         // --- Logika Motywu (Jasny/Ciemny) ---
         SwitchMaterial darkModeSwitch = view.findViewById(R.id.settingsDarkModeSwitch);
+        // Wczytanie preferencji motywu (domyślnie ciemny - true)
         boolean isDarkMode = sharedPreferences.getBoolean("dark_mode", true);
         darkModeSwitch.setChecked(isDarkMode);
-
+        // Nasłuchiwacz zmian stanu przełącznika motywu
         darkModeSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             sharedPreferences.edit().putBoolean("dark_mode", isChecked).apply();
             if (isChecked) {
@@ -66,14 +89,14 @@ public class SettingsFragment extends Fragment {
         // --- Logika Języka ---
         LinearLayout languageContainer = view.findViewById(R.id.settingsLanguageContainer);
         TextView languageValueText = view.findViewById(R.id.settingsLanguageValueText);
-
+        // Wczytanie aktualnego języka (domyślnie polski - "pl")
         String currentLanguage = sharedPreferences.getString("language", "pl");
         if (currentLanguage.equals("en")) {
             languageValueText.setText("English");
         } else {
             languageValueText.setText("Polski");
         }
-
+        // Obsługa kliknięcia w kontener języka - wyświetla okno dialogowe wyboru
         languageContainer.setOnClickListener(v -> {
             String[] languages = {"Polski", "English"};
             int checkedItem = currentLanguage.equals("en") ? 1 : 0;
@@ -94,13 +117,13 @@ public class SettingsFragment extends Fragment {
                     .show();
         });
 
-        // Save button - saves step goal and SOS phone at once
+        // --- Logika Zapisywania (Kroki i SOS) ---
         Button saveButton = view.findViewById(R.id.settingsSaveButton);
         saveButton.setOnClickListener(v -> {
             String goalText = stepGoalInput.getText() != null ? stepGoalInput.getText().toString().trim() : "";
             String phoneText = sosPhoneInput.getText() != null ? sosPhoneInput.getText().toString().trim() : "";
 
-            // Validate step goal
+            // Walidacja wprowadzonego celu kroków
             if (goalText.isEmpty()) {
                 goalText = "10000";
             }
@@ -110,17 +133,18 @@ public class SettingsFragment extends Fragment {
             } catch (NumberFormatException e) {
                 goalText = "10000";
             }
-
+            // Zapis zwalidowanych danych
             sharedPreferences.edit()
                     .putString("step_goal", goalText)
                     .putString("sos_phone", phoneText)
                     .apply();
 
-            // Sprawdź czy obecne kroki < nowy cel → restart serwisu
+            // Inteligentna aktualizacja serwisu krokomierza
             int currentSteps = sharedPreferences.getInt("last_recorded_steps", 0);
             int newGoal = Integer.parseInt(goalText);
+            // Jeśli użytkownik zwiększył cel i liczba kroków jest od niego mniejsza
             if (currentSteps < newGoal) {
-                // Cel nie osiągnięty z nowym limitem - odblokuj i restart serwis
+                // Odblokuj flagę osiągnięcia celu
                 sharedPreferences.edit().putBoolean("goal_reached_today", false).apply();
                 Intent serviceIntent = new Intent(requireContext(), StepCounterService.class);
                 androidx.core.content.ContextCompat.startForegroundService(requireContext(), serviceIntent);
@@ -129,10 +153,13 @@ public class SettingsFragment extends Fragment {
             Toast.makeText(getContext(), "Zapisano ustawienia", Toast.LENGTH_SHORT).show();
         });
 
-        // --- Logika z brancha test (Prawdziwe wylogowanie z Firebase) ---
+        // --- Logika wylogowania---
         Button logoutButton = view.findViewById(R.id.settingsLogoutButton);
         logoutButton.setOnClickListener(v -> {
+            // Bezpieczne wylogowanie sesji na serwerach Firebase
             FirebaseAuth.getInstance().signOut();
+            // Przekierowanie do ekranu logowania z wyczyszczeniem stosu aktywności (backstack)
+            // Zapobiega to powrotowi do aplikacji po wciśnięciu sprzętowego przycisku "Wstecz"
             Intent intent = new Intent(requireActivity(), LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);

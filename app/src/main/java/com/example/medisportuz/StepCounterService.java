@@ -20,11 +20,20 @@ import androidx.core.app.NotificationCompat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-
+/**
+ * @brief Usługa działająca w tle (Foreground Service) odpowiedzialna za zliczanie kroków użytkownika.
+ * * Wykorzystuje sprzętowe sensory urządzenia (TYPE_STEP_COUNTER oraz TYPE_STEP_DETECTOR)
+ * do monitorowania aktywności. Posiada zaimplementowany własny filtr niwelujący wpływ
+ * przypadkowych ruchów ręką. O północy licznik ulega wyzerowaniu. Kiedy użytkownik
+ * osiągnie swój dzienny cel, serwis wysyła powiadomienie typu "High Priority"
+ * i zatrzymuje swoje działanie, aby oszczędzać baterię.
+ */
 public class StepCounterService extends Service implements SensorEventListener {
 
     private static final String TAG = "StepCounterService";
+    /** ID kanału powiadomienia ciągłego (Foreground) */
     private static final String CHANNEL_ID = "StepCounterChannel";
+    /** ID kanału dla powiadomienia o osiągnięciu celu */
     private static final String GOAL_CHANNEL_ID = "StepGoalChannel";
     private static final int NOTIFICATION_ID = 1;
     private static final int GOAL_NOTIFICATION_ID = 2;
@@ -33,19 +42,33 @@ public class StepCounterService extends Service implements SensorEventListener {
     private Sensor stepCounterSensor;
     private Sensor stepDetectorSensor;
     private SharedPreferences prefs;
-
+    /** * @brief Stan sprzętowego licznika w momencie resetu.
+     * Ponieważ systemowy TYPE_STEP_COUNTER zlicza kroki od momentu uruchomienia telefonu,
+     * musimy przechowywać wartość odcięcia (offset), aby obliczyć kroki dla danego dnia.
+     */
     private float stepsAtReset = -1;
+    /** Aktualna, dzienna liczba kroków obliczona przez aplikację */
     private int currentDaySteps = 0;
+    /** Domyślny dzienny cel użytkownika, pobierany z ustawień */
     private int stepGoal = 10000;
+    /** Flaga określająca, czy cel został dzisiaj osiągnięty */
     private boolean goalReachedToday = false;
-    
-    // Algorytm buforowania (filtr machania ręką)
-    private int stepBuffer = 0;
-    private long lastStepTimeNs = 0;
-    private static final long MIN_STEP_DELAY_NS = 200000000L; // 200ms
-    private static final long MAX_STEP_DELAY_NS = 2000000000L; // 2s
-    private static final int MIN_STEPS_TO_START = 6;
 
+    // --- Algorytm buforowania (filtr "machania ręką") ---
+
+    /** Licznik zarejestrowanych, poprawnych ruchów w bieżącej serii kroków */
+    private int stepBuffer = 0;
+    /** Znacznik czasu ostatniego wykrytego kroku w nanosekundach */
+    private long lastStepTimeNs = 0;
+    /** Minimalny dopuszczalny odstęp między krokami (200ms) - odsiewa zakłócenia */
+    private static final long MIN_STEP_DELAY_NS = 200000000L; // 200ms
+    /** Maksymalny odstęp między krokami (2s) - powyżej traktowane jako przerwa w spacerze */
+    private static final long MAX_STEP_DELAY_NS = 2000000000L; // 2s
+    /** Minimalna liczba kroków, aby system uznał, że zaczął się spacer, a nie pojedynczy ruch */
+    private static final int MIN_STEPS_TO_START = 6;
+    /**
+     * @brief Wywoływana przy tworzeniu usługi. Inicjuje konfigurację i sensory.
+     */
     @Override
     public void onCreate() {
         super.onCreate();
@@ -60,11 +83,14 @@ public class StepCounterService extends Service implements SensorEventListener {
 
         createNotificationChannel();
         createGoalNotificationChannel();
+        // Uruchomienie jako Foreground Service, zapobiegające ubiciu procesu przez system Android
         startForeground(NOTIFICATION_ID, getNotification(currentDaySteps));
 
         registerSensors();
     }
-
+    /**
+     * @brief Wczytuje aktualny cel kroków z ustawień użytkownika.
+     */
     private void loadStepGoal() {
         String goalStr = prefs.getString("step_goal", "10000");
         try {
@@ -74,7 +100,10 @@ public class StepCounterService extends Service implements SensorEventListener {
         }
         goalReachedToday = prefs.getBoolean("goal_reached_today", false);
     }
-
+    /**
+     * @brief Sprawdza, czy nastąpiła zmiana daty. Jeśli tak, zeruje dzienny licznik kroków.
+     * * Zapisuje nową datę do preferencji, aby wymusić ponowne odczytanie offsetu sprzętowego.
+     */
     private void checkMidnightReset() {
         String lastDate = prefs.getString("last_recorded_date", "");
         String currentDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
@@ -97,7 +126,9 @@ public class StepCounterService extends Service implements SensorEventListener {
             goalReachedToday = prefs.getBoolean("goal_reached_today", false);
         }
     }
-
+    /**
+     * @brief Rejestruje usługę jako nasłuchiwacza na zmiany sprzętowe czujników ruchu.
+     */
     private void registerSensors() {
         if (stepDetectorSensor != null) {
             sensorManager.registerListener(this, stepDetectorSensor, SensorManager.SENSOR_DELAY_FASTEST);
@@ -106,14 +137,21 @@ public class StepCounterService extends Service implements SensorEventListener {
             sensorManager.registerListener(this, stepCounterSensor, SensorManager.SENSOR_DELAY_UI);
         }
     }
-
+    /**
+     * @brief Wywoływana za każdym razem, gdy Activity wywołuje startService().
+     * * Pozwala odświeżyć dane, np. zmieniony cel z ustawień. START_STICKY oznacza,
+     * że system spróbuje podnieść usługę w razie jej ubicia przez brak zasobów.
+     */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         // Reload goal in case it was changed from Settings
         loadStepGoal();
         return START_STICKY;
     }
-
+    /**
+     * @brief Odbiera nowe dane z podpiętych czujników kroków.
+     * @param event Obiekt zdarzenia zawierający typ sensora i jego aktualne wartości.
+     */
     @Override
     public void onSensorChanged(SensorEvent event) {
         checkMidnightReset(); // Dodatkowe sprawdzenie przy zmianie sensora
@@ -128,7 +166,12 @@ public class StepCounterService extends Service implements SensorEventListener {
             handleCounterSync(event.values[0]);
         }
     }
-
+    /**
+     * @brief Analizuje pojedyncze kroki za pomocą autorskiego filtru.
+     * * Jeśli czas między krokami jest prawidłowy i nazbiera się ich minimalna seria
+     * (MIN_STEPS_TO_START), są one dodawane do głównego licznika.
+     * @param timeNs Znacznik czasu zdarzenia (w nanosekundach).
+     */
     private void handleDetectorStep(long timeNs) {
         long delay = timeNs - lastStepTimeNs;
         if (delay < MIN_STEP_DELAY_NS) return;
@@ -149,7 +192,11 @@ public class StepCounterService extends Service implements SensorEventListener {
             saveAndNotify();
         }
     }
-
+    /**
+     * @brief Synchronizuje licznik dzienny z globalnym krokomierzem sprzętowym.
+     * * Rozwiązuje problem "zgubienia" kroków, gdy usługa została na chwilę zamknięta przez system.
+     * @param totalSteps Całkowita liczba kroków ze sprzętowego sensora TYPE_STEP_COUNTER.
+     */
     private void handleCounterSync(float totalSteps) {
         if (stepsAtReset == -1) {
             stepsAtReset = totalSteps;
@@ -164,7 +211,10 @@ public class StepCounterService extends Service implements SensorEventListener {
             saveAndNotify();
         }
     }
-
+    /**
+     * @brief Zapisuje zaktualizowaną liczbę kroków do pamięci, wysyła komunikat (Broadcast)
+     * do Activity oraz sprawdza, czy dzienny cel został osiągnięty.
+     */
     private void saveAndNotify() {
         prefs.edit().putInt("last_recorded_steps", currentDaySteps).apply();
         broadcastStepUpdate(currentDaySteps);
@@ -185,7 +235,10 @@ public class StepCounterService extends Service implements SensorEventListener {
 
         updateNotification(currentDaySteps);
     }
-
+    /**
+     * @brief Wyświetla jednorazowe, wyróżniające się powiadomienie z gratulacjami
+     * w momencie osiągnięcia wyznaczonego przez użytkownika celu.
+     */
     private void showGoalReachedNotification() {
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if (notificationManager == null) return;
@@ -204,21 +257,30 @@ public class StepCounterService extends Service implements SensorEventListener {
 
         notificationManager.notify(GOAL_NOTIFICATION_ID, notification);
     }
-
+    /**
+     * @brief Rozsyła aktualną liczbę kroków jako intencję (Broadcast).
+     * Jeśli aplikacja jest na ekranie, fragment odbierze te dane i zaktualizuje UI.
+     */
     private void broadcastStepUpdate(int steps) {
         Intent intent = new Intent("STEP_UPDATE");
         intent.setPackage(getPackageName());
         intent.putExtra("steps", steps);
         sendBroadcast(intent);
     }
-
+    /**
+     * @brief Odświeża zawartość nieusuwalnego powiadomienia na pasku powiadomień.
+     */
     private void updateNotification(int steps) {
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if (notificationManager != null) {
             notificationManager.notify(NOTIFICATION_ID, getNotification(steps));
         }
     }
-
+    /**
+     * @brief Generuje obiekt Notification dla trybu Foreground.
+     * @param steps Liczba kroków wyświetlana w powiadomieniu.
+     * @return Gotowy obiekt powiadomienia.
+     */
     private Notification getNotification(int steps) {
         float calories = steps * 0.04f;
         String contentText = String.format(Locale.getDefault(), "Kroki: %d  |  Kalorie: %.0f kcal", steps, calories);
@@ -231,7 +293,10 @@ public class StepCounterService extends Service implements SensorEventListener {
                 .setOngoing(true)
                 .build();
     }
-
+    /**
+     * @brief Tworzy systemowy kanał powiadomień "Licznik Kroków" (wymagane od Android 8.0 Oreo).
+     * Posiada niski priorytet, co zapobiega irytującemu dźwiękowi przy każdej aktualizacji kroku.
+     */
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel serviceChannel = new NotificationChannel(
@@ -243,7 +308,10 @@ public class StepCounterService extends Service implements SensorEventListener {
             if (manager != null) manager.createNotificationChannel(serviceChannel);
         }
     }
-
+    /**
+     * @brief Tworzy systemowy kanał powiadomień "Licznik Kroków" (wymagane od Android 8.0 Oreo).
+     * Posiada niski priorytet, co zapobiega irytującemu dźwiękowi przy każdej aktualizacji kroku.
+     */
     private void createGoalNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel goalChannel = new NotificationChannel(
@@ -256,13 +324,16 @@ public class StepCounterService extends Service implements SensorEventListener {
             if (manager != null) manager.createNotificationChannel(goalChannel);
         }
     }
-
+    /** Nieużywane w tym zastosowaniu. Wymagane przez interfejs SensorEventListener. */
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {}
-
+    /** Usługa typu Started (nie Bound), więc zwracany jest null. */
     @Override
     public IBinder onBind(Intent intent) { return null; }
-
+    /**
+     * @brief Wywoływana podczas zatrzymywania usługi.
+     * Zwalnia zasoby systemowe, odpina sensory oraz czyści powiadomienie z paska.
+     */
     @Override
     public void onDestroy() {
         super.onDestroy();

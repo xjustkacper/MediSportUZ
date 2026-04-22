@@ -5,8 +5,21 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-
+/**
+ * @brief Główna aktywność aplikacji pełniąca rolę kontenera dla fragmentów.
+ * * Klasa ta zarządza dolnym paskiem nawigacyjnym (BottomNavigationView) i umożliwia
+ * płynne przełączanie się pomiędzy kluczowymi modułami aplikacji: Stroną główną (Home),
+ * Pogodą (Weather), Notatkami (Notes) oraz Ustawieniami (Settings).
+ */
 public class MainActivity extends AppCompatActivity {
+    /**
+     * @brief Inicjalizuje główny ekran aplikacji i konfiguruje nawigację.
+     * * Metoda ta ustawia widok aktywności, przypisuje logikę do paska nawigacyjnego
+     * i ładuje domyślny fragment (HomeFragment) przy pierwszym uruchomieniu aplikacji.
+     * * @param savedInstanceState Stan zapisany z poprzedniej instancji aktywności.
+     * Sprawdzenie (savedInstanceState == null) gwarantuje, że domyślny fragment
+     * zostanie załadowany tylko przy pierwszym uruchomieniu, a nie np. po obrocie ekranu.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,7 +52,13 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
     }
-
+    /**
+     * @brief Podmienia aktualnie wyświetlany fragment w kontenerze.
+     * * Wykorzystuje narzędzie SupportFragmentManager do zainicjowania transakcji,
+     * która podmienia zawartość elementu R.id.fragmentContainer na nowo wybrany fragment.
+     * * @param fragment Instancja nowo utworzonego fragmentu (dziedziczącego po klasie Fragment),
+     * która ma zostać wyświetlona na ekranie.
+     */
     private void loadFragment(Fragment fragment) {
         getSupportFragmentManager()
                 .beginTransaction()

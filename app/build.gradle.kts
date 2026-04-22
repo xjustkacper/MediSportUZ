@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace = "com.example.medisportuz"
-    compileSdk = 36
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.medisportuz"
         minSdk = 30
-        targetSdk = 36
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -38,6 +38,10 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    androidTestImplementation(libs.androidx.test.rules)
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.androidx.test.core)
+    androidTestImplementation(libs.androidx.test.monitor)
 
     // --- Biblioteki z brancha test (Firebase) ---
     implementation(platform("com.google.firebase:firebase-bom:34.11.0"))
@@ -50,6 +54,5 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:21.3.0")
     implementation("androidx.room:room-runtime:2.6.1")
     annotationProcessor("androidx.room:room-compiler:2.6.1")
-    implementation("com.google.android.material:material:1.11.0")
     implementation("com.google.android.gms:play-services-ads:23.6.0")
 }
